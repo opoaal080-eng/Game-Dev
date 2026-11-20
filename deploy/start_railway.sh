@@ -17,5 +17,6 @@ mkdir -p "${PRIVATE_UPLOAD_ROOT}"
 
 python manage.py migrate --noinput
 python manage.py bootstrap_admin
+python manage.py bootstrap_developers
 python manage.py collectstatic --noinput
 exec gunicorn nightwell_dev.wsgi:application --bind "0.0.0.0:${PORT:-8000}" --workers 2 --access-logfile - --error-logfile -
