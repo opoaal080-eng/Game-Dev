@@ -2,7 +2,7 @@ from pathlib import Path
 
 from django import forms
 from django.core.exceptions import ValidationError
-from .models import Asset, Post, Task
+from .models import Asset, Post, Task, GameInfo, GameEvent, GameCharacter
 
 
 class PostForm(forms.ModelForm):
@@ -45,3 +45,24 @@ class AssetForm(forms.ModelForm):
         if Path(upload.name).suffix.lower() not in ALLOWED_EXTENSIONS:
             raise ValidationError("Этот формат файла пока не разрешён")
         return upload
+
+
+class GameInfoForm(forms.ModelForm):
+    class Meta:
+        model = GameInfo
+        fields = ["title", "genre", "tagline", "setting", "story", "gameplay", "themes", "universe", "platforms", "engine", "development_status", "audience", "notes"]
+        widgets = {name: forms.Textarea(attrs={"rows": 5}) for name in ("setting", "story", "gameplay", "themes", "universe", "notes")}
+
+
+class GameEventForm(forms.ModelForm):
+    class Meta:
+        model = GameEvent
+        fields = ["chapter", "title", "kind", "order", "timeline", "location", "participants", "summary", "description", "consequences", "spoiler"]
+        widgets = {name: forms.Textarea(attrs={"rows": 4}) for name in ("summary", "description", "consequences")}
+
+
+class GameCharacterForm(forms.ModelForm):
+    class Meta:
+        model = GameCharacter
+        fields = ["name", "role", "faction", "bio", "motivation", "notes", "order"]
+        widgets = {name: forms.Textarea(attrs={"rows": 4}) for name in ("bio", "motivation", "notes")}
