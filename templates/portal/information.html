@@ -1,0 +1,91 @@
+{% extends 'base.html' %}{% load content %}
+{% block title %}Информация{% endblock %}{% block crumb %}ИНФОРМАЦИЯ{% endblock %}
+{% block content %}
+<div class="page-head bible-title">
+  <div><span class="eyebrow">GAME BIBLE / ИНФОРМАЦИЯ О ПРОЕКТЕ</span>
+    <h1>Информация<span class="accent">.</span></h1>
+    <p>Мир игры, сюжет, события, персонажи и все творческие решения в одном месте.</p></div>
+  {% if can_write %}<a class="btn btn-primary" href="{% url 'information_edit' project.pk %}">Редактировать</a>{% endif %}
+</div>
+<form class="filters bible-filter" method="get"><div class="filter-group"><label for="project">Проект</label>
+  <select id="project" name="project" aria-label="Выберите проект">{% for p in projects %}<option value="{{ p.pk }}" {% if p.pk == project.pk %}selected{% endif %}>{{ p.title }}</option>{% endfor %}</select>
+  <button class="btn btn-ghost" type="submit">Открыть</button></div></form>
+<section class="bible-hero">
+  <span class="eyebrow">ОФИЦИАЛЬНАЯ БАЗА ЗНАНИЙ</span>
+  <div class="bible-heading"><div><h2>{{ info.title|default:project.title }}</h2>
+  <p>{{ info.tagline|default:project.description|default:"Добавьте описание игры через редактор." }}</p></div>
+  <div class="bible-symbol">N</div></div>
+  <div class="bible-metadata">
+    <div><small>ЖАНР</small><strong>{{ info.genre|default:"Не указан" }}</strong></div>
+    <div><small>ДВИЖОК</small><strong>{{ info.engine|default:"Не указан" }}</strong></div>
+    <div><small>ПЛАТФОРМЫ</small><strong>{{ info.platforms|default:"Не указаны" }}</strong></div>
+    <div><small>СТАДИЯ</small><strong>{{ info.development_status|default:"В разработке" }}</strong></div>
+  </div>
+</section>
+<div class="bible-chips" aria-label="Разделы">
+  <a href="#story">Сюжет</a><a href="#world">Мир</a><a href="#gameplay">Геймплей</a><a href="#events">События</a><a href="#characters">Персонажи</a><a href="#details">Подробнее</a>
+</div>
+<div class="bible-grid">
+  <article id="story" class="bible-panel bible-large"><div class="bible-panel-head"><span class="bible-pictogram">01</span><div><span class="eyebrow">ИСТОРИЯ</span><h3>Сюжет</h3></div></div>
+    <div class="markdown-body">{% if info.story %}{{ info.story|render_markdown }}{% else %}<p class="bible-empty">Сюжет пока не описан. Добавьте завязку, ключевые конфликты и развитие истории.</p>{% endif %}</div></article>
+  <article id="world" class="bible-panel"><div class="bible-panel-head"><span class="bible-pictogram">02</span><div><span class="eyebrow">ВСЕЛЕННАЯ</span><h3>Мир и сеттинг</h3></div></div>
+    <div class="markdown-body">{% if info.setting %}{{ info.setting|render_markdown }}{% else %}<p class="bible-empty">Место, время и правила мира ещё не указаны.</p>{% endif %}</div></article>
+  <article id="gameplay" class="bible-panel"><div class="bible-panel-head"><span class="bible-pictogram">03</span><div><span class="eyebrow">ИГРОВОЙ ПРОЦЕСС</span><h3>Геймплей</h3></div></div>
+    <div class="markdown-body">{% if info.gameplay %}{{ info.gameplay|render_markdown }}{% else %}<p class="bible-empty">Здесь будут основные механики и игровой цикл.</p>{% endif %}</div></article>
+</div>
+<section class="bible-section" id="events">
+  <div class="bible-section-head"><div><span class="eyebrow">ХРОНОЛОГИЯ / АКТЫ / ГЛАВЫ</span><h2>События</h2><p>Разделение сюжета на связанные эпизоды и последовательность событий.</p></div>
+    {% if can_write %}<a class="btn btn-ghost" href="{% url 'event_create' project.pk %}">＋ Событие</a>{% endif %}</div>
+  <div class="bible-timeline">
+    {% for event in events %}
+    <article class="bible-event">
+      <div class="bible-timeline-number">{{ event.order }}</div>
+      <div class="bible-event-content">
+        <div class="bible-event-meta"><span class="tag">{% if event.chapter %}{{ event.chapter }}{% else %}Событие {{ event.order }}{% endif %}</span>
+          <span class="tag">{{ event.get_kind_display }}</span>{% if event.spoiler %}<span class="tag tag-warning">Спойлер</span>{% endif %}</div>
+        <h3>{{ event.title }}</h3>
+        {% if event.summary %}<p>{{ event.summary|linebreaksbr }}</p>{% endif %}
+        {% if event.location or event.timeline or event.participants %}<div class="bible-event-facts">
+          {% if event.timeline %}<span>⏱ {{ event.timeline }}</span>{% endif %}
+          {% if event.location %}<span>Место: {{ event.location }}</span>{% endif %}
+          {% if event.participants %}<span>Участники: {{ event.participants }}</span>{% endif %}</div>{% endif %}
+        {% if event.description or event.consequences %}<details class="bible-details"><summary>Подробности события</summary>
+          <div class="markdown-body">{{ event.description|render_markdown }}</div>{% if event.consequences %}<h4>Последствия и развилки</h4><div class="markdown-body">{{ event.consequences|render_markdown }}</div>{% endif %}</details>{% endif %}
+        {% if can_write %}<a class="bible-edit" href="{% url 'event_edit' event.pk %}">Редактировать ↗</a>{% endif %}
+      </div>
+    </article>
+    {% empty %}
+    <div class="bible-no-items"><span>Нет событий</span><p>Добавьте первую главу или событие, чтобы собрать хронологию истории.</p></div>
+    {% endfor %}
+  </div>
+</section>
+<section class="bible-section" id="characters">
+  <div class="bible-section-head"><div><span class="eyebrow">ГЕРОИ / АНТАГОНИСТЫ / NPC</span><h2>Персонажи</h2><p>Участники истории, их роли, связи и мотивация.</p></div>
+    {% if can_write %}<a class="btn btn-ghost" href="{% url 'character_create' project.pk %}">＋ Персонаж</a>{% endif %}</div>
+  <div class="bible-character-grid">
+    {% for character in characters %}
+    <article class="bible-character">
+      <div class="bible-avatar">{{ character.name|slice:':1'|upper }}</div>
+      <div class="bible-character-details"><span class="eyebrow">{{ character.role|default:"Персонаж" }}</span><h3>{{ character.name }}</h3>
+        {% if character.faction %}<span class="bible-faction">{{ character.faction }}</span>{% endif %}
+        {% if character.bio %}<p>{{ character.bio|truncatechars:200 }}</p>{% endif %}
+        {% if character.motivation or character.notes %}<details class="bible-details"><summary>Полное описание</summary>
+          <div class="markdown-body">{{ character.bio|render_markdown }}{{ character.motivation|render_markdown }}{{ character.notes|render_markdown }}</div></details>{% endif %}
+        {% if can_write %}<a class="bible-edit" href="{% url 'character_edit' character.pk %}">Редактировать ↗</a>{% endif %}
+      </div>
+    </article>
+    {% empty %}<div class="bible-no-items"><span>Персонажей пока нет</span><p>Добавьте героев, их биографии и роли в сюжете.</p></div>{% endfor %}
+  </div>
+</section>
+<section class="bible-section" id="details"><div class="bible-section-head"><div><span class="eyebrow">ДОПОЛНИТЕЛЬНЫЕ ДАННЫЕ</span><h2>Детали мира</h2></div></div>
+  <div class="bible-grid">
+    <article class="bible-panel"><div class="bible-panel-head"><span class="bible-pictogram">04</span><div><span class="eyebrow">ПРЕДЫСТОРИЯ</span><h3>Лор</h3></div></div>
+      <div class="markdown-body">{{ info.universe|default:"Пока не заполнено."|render_markdown }}</div></article>
+    <article class="bible-panel"><div class="bible-panel-head"><span class="bible-pictogram">05</span><div><span class="eyebrow">НАСТРОЕНИЕ</span><h3>Темы и атмосфера</h3></div></div>
+      <div class="markdown-body">{{ info.themes|default:"Пока не заполнено."|render_markdown }}</div></article>
+    <article class="bible-panel"><div class="bible-panel-head"><span class="bible-pictogram">06</span><div><span class="eyebrow">О ПРОЕКТЕ</span><h3>Прочее</h3></div></div>
+      <div class="markdown-body">{{ info.notes|default:"Пока не заполнено."|render_markdown }}</div>
+      {% if info.audience %}<p class="bible-muted">Аудитория: {{ info.audience }}</p>{% endif %}</article>
+  </div>
+</section>
+{% endblock %}
