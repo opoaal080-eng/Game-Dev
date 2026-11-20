@@ -32,6 +32,7 @@
     </nav>
     <div class="sidebar-bottom">
       <div class="profile"><div class="avatar">{{ request.user.username|slice:':1'|upper }}</div><div class="profile-copy"><strong>{{ request.user.get_full_name|default:request.user.username }}</strong><span>{% if workspace_role == 'admin' %}Администратор{% elif workspace_role == 'developer' %}Разработчик{% else %}Наблюдатель{% endif %}</span></div></div>
+      <a href="{% url 'password_change' %}" class="nav-link"><span class="nav-ico">⚿</span> Сменить пароль</a>
       <form action="{% url 'logout' %}" method="post">{% csrf_token %}<button type="submit" class="logout" title="Выйти из аккаунта">Выйти ↗</button></form>
     </div>
   </aside>
