@@ -264,7 +264,8 @@
     const grid=node("div","character-grid");
     state.team.forEach(m=>{
       const b=box(node("div","char-avatar",(m.username||"?").slice(0,1).toUpperCase()),
-        title(m.name||m.username,"h3"),sub({admin:"Администратор",developer:"Разработчик",viewer:"Наблюдатель"}[m.role]||m.role));
+        title(m.name||m.username,"h3"),sub({admin:"Администратор",developer:"Разработчик",viewer:"Наблюдатель"}[m.role]||m.role),
+        m.job_title?node("p","muted",m.job_title):null);
       grid.append(b);
     });c.append(grid);
   }
