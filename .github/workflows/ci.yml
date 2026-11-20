@@ -19,3 +19,24 @@ jobs:
           python manage.py check
           python manage.py makemigrations --check --dry-run
           python manage.py test
+
+  smoke:
+    name: Verify live login page
+    needs: checks
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check Railway HTTPS login page
+        run: |
+          set -e
+          for i in $(seq 1 18); do
+            code=$(curl -sSL --max-time 12 -o /tmp/login-page.html -w "%{http_code}" "https://nightwell-dev-web-production.up.railway.app/login/" || echo "000")
+            echo "Attempt $i HTTP $code"
+            if [ "$code" = 200 ]; then
+              grep -qi "nightwell" /tmp/login-page.html
+              exit 0
+            fi
+            sleep 5
+          done
+          echo "Login endpoint did not return HTTP 200" >&2
+          exit 1
