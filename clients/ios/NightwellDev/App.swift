@@ -469,7 +469,7 @@ struct PostEditor: View {
     @EnvironmentObject var store: DevStore
     @Environment(\.dismiss) private var dismiss
     @State private var title = ""
-    @State private var body = ""
+    @State private var postBody = ""
     @State private var kind = "note"
     @State private var status = "published"
     @State private var message: String?
@@ -484,14 +484,14 @@ struct PostEditor: View {
                     Text("Решение").tag("decision")
                 }
                 Picker("Статус", selection: $status) { Text("Опубликовано").tag("published"); Text("Черновик").tag("draft") }
-                Section("Содержание") { TextEditor(text: $body).frame(minHeight: 200) }
+                Section("Содержание") { TextEditor(text: $postBody).frame(minHeight: 200) }
                 if let message { Text(message).foregroundStyle(.orange) }
             }.navigationTitle("Новая запись")
                 .toolbar {
                     ToolbarItem(placement: .cancellationAction) { Button("Отмена") { dismiss() } }
                     ToolbarItem(placement: .confirmationAction) { Button("Сохранить") {
                         Task {
-                            do { try await store.makePost(title: title, body: body, kind: kind, status: status); dismiss() }
+                            do { try await store.makePost(title: title, body: postBody, kind: kind, status: status); dismiss() }
                             catch { message = error.localizedDescription }
                         }
                     }.disabled(title.isEmpty) }
