@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#0a0b0d">
+  <meta name="description" content="ASHFALL. Официальный сайт игрового проекта Nightwell. Информация об игре, мир, новости и медиа.">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="ASHFALL · Official Website">
+  <meta property="og:description" content="ASHFALL — игровой проект NIGHTWELL.">
+  <title>ASHFALL · Официальный сайт</title>
+  <link rel="icon" href="../static/player/icon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="../static/player/site.css">
+  <script src="../static/player/site.js" defer></script>
+</head>
+<body>
+  <div id="preloader" class="preloader" aria-hidden="true">
+    <span class="preloader-symbol">A<span class="slash"></span></span>
+    <span class="preloader-name">ASHFALL</span>
+  </div>
+  <header class="site-header" id="site-header">
+    <a href="#top" class="brand" aria-label="ASHFALL, на главную"><span class="brand-icon">A</span><span>ASHFALL<small>BY NIGHTWELL</small></span></a>
+    <nav class="desktop-nav" aria-label="Навигация">
+      <a href="#about">Об игре</a><a href="#world">Мир</a><a href="#features">Особенности</a><a href="#media">Медиа</a><a href="#news">Новости</a>
+    </nav>
+    <a href="#community" class="header-action">СООБЩЕСТВО <span aria-hidden="true">↗</span></a>
+    <button type="button" class="menu-trigger" id="menu-trigger" aria-label="Открыть меню" aria-expanded="false" aria-controls="mobile-nav"><span></span><span></span></button>
+  </header>
+  <nav id="mobile-nav" class="mobile-nav" aria-label="Мобильная навигация" hidden>
+    <a href="#about">Об игре</a><a href="#world">Мир</a><a href="#features">Особенности</a><a href="#media">Медиа</a><a href="#news">Новости</a><a href="#community">Сообщество</a>
+  </nav>
+
+  <main id="top">
+    <section class="hero" aria-labelledby="hero-title">
+      <div class="hero-art" aria-hidden="true">
+        <img id="hero-image" class="hero-photo" alt="" hidden loading="eager">
+        <div class="hero-glow"></div><div class="hero-embers"></div><div class="hero-shape"></div><div class="hero-vignette"></div>
+      </div>
+      <div class="hero-content">
+        <div class="hero-overline"><span class="overline-rule"></span><span id="eyebrow">NIGHTWELL / ИГРОВОЙ ПРОЕКТ</span></div>
+        <div class="hero-middle">
+          <span class="hero-index">01 / НАЧАЛО</span>
+          <h1 id="hero-title">ASHFALL<span class="hero-period">.</span></h1>
+          <p class="hero-tagline" id="hero-tagline">Официальный сайт проекта</p>
+          <div class="hero-buttons">
+            <a class="button button-primary" href="#about">УЗНАТЬ ОБ ИГРЕ <span aria-hidden="true">↘</span></a>
+            <a class="button button-outline" href="#news">НОВОСТИ <span aria-hidden="true">↗</span></a>
+          </div>
+        </div>
+        <div class="hero-bottom">
+          <span class="hero-scroll"><span class="scroll-track"><span></span></span> ЛИСТАЙ ВНИЗ</span>
+          <span class="hero-credit">ASHFALL <i></i> NIGHTWELL</span>
+        </div>
+      </div>
+      <div class="hero-side-text" aria-hidden="true">OFFICIAL GAME WEBSITE / NIGHTWELL</div>
+    </section>
+
+    <div class="page-wrap">
+      <div class="status-bar" aria-label="Сведения об игре">
+        <div class="status-cell"><span>ПРОЕКТ</span><b>ASHFALL</b></div>
+        <div class="status-cell"><span>ЖАНР</span><b id="game-genre">БУДЕТ ОБЪЯВЛЕН</b></div>
+        <div class="status-cell"><span>ПЛАТФОРМЫ</span><b id="game-platforms">БУДУТ ОБЪЯВЛЕНЫ</b></div>
+        <div class="status-cell"><span>СТАДИЯ</span><b id="game-status">В РАЗРАБОТКЕ</b></div>
+      </div>
+
+      <section id="about" class="section about-section">
+        <div class="section-top"><span class="kicker"><span class="kicker-line"></span> 01 / ПРОЕКТ</span><span class="section-aside">ABOUT THE GAME</span></div>
+        <div class="about-grid">
+          <div class="section-heading"><h2>НЕЧТО<br><em>БОЛЬШЕЕ.</em></h2></div>
+          <div class="section-copy">
+            <span class="eyebrow">ASHFALL — BY NIGHTWELL</span>
+            <p class="lead" id="game-intro">Подробности игрового проекта ASHFALL появятся здесь по мере публикации командой разработчиков.</p>
+            <p class="body-text" id="game-story" hidden></p>
+            <div class="about-foot"><span id="game-release">ИНФОРМАЦИЯ О РЕЛИЗЕ ПОЗЖЕ</span><span class="asterisk">✳</span></div>
+          </div>
+        </div>
+      </section>
+
+      <section id="world" class="section world-section" hidden>
+        <div class="section-top"><span class="kicker"><span class="kicker-line"></span> 02 / МИР</span><span class="section-aside">THE WORLD</span></div>
+        <div class="world-panel">
+          <div class="world-outline" aria-hidden="true">A</div>
+          <div class="world-content"><span class="eyebrow">МИР ASHFALL</span><h2>ЗА ГРАНЬЮ<br>ИЗВЕСТНОГО.</h2><p id="world-description"></p></div>
+        </div>
+      </section>
+
+      <section id="features" class="section features-section" hidden>
+        <div class="section-top"><span class="kicker"><span class="kicker-line"></span> 03 / ОСОБЕННОСТИ</span><span class="section-aside">GAME FEATURES</span></div>
+        <div class="section-heading"><h2>ЧТО ВНУТРИ<br><em>ASHFALL?</em></h2></div>
+        <div id="features-grid" class="features-grid"></div>
+      </section>
+
+      <section id="media" class="section media-section" hidden>
+        <div class="section-top"><span class="kicker"><span class="kicker-line"></span> 04 / МЕДИА</span><span class="section-aside">SCREENSHOTS & VIDEO</span></div>
+        <div class="section-title-row"><h2>ВЗГЛЯД<br><em>НА ИГРУ.</em></h2><a id="trailer-link" class="button button-outline" target="_blank" rel="noopener noreferrer" hidden>СМОТРЕТЬ ВИДЕО ↗</a></div>
+        <div id="gallery" class="gallery"></div>
+      </section>
+
+      <section id="news" class="section news-section">
+        <div class="section-top"><span class="kicker"><span class="kicker-line"></span> 05 / ХРОНИКА</span><span class="section-aside">LATEST UPDATES</span></div>
+        <div class="section-title-row"><h2>НОВОСТИ<br><em>ПРОЕКТА.</em></h2><p>Официальные публикации команды ASHFALL.</p></div>
+        <div id="news-grid" class="news-grid"><div class="news-empty"><span>/// 001</span><p>Здесь скоро появятся новости проекта.</p></div></div>
+      </section>
+
+      <section id="community" class="community-section">
+        <div class="community-noise" aria-hidden="true"></div>
+        <div class="community-copy">
+          <span class="eyebrow">СООБЩЕСТВО / ASHFALL</span>
+          <h2>БУДЬ<br>ЧАСТЬЮ<br><em>ИСТОРИИ.</em></h2>
+          <p>Следи за новостями проекта и публикациями разработчиков.</p>
+          <div id="social-links" class="social-links"><span class="awaiting">Официальные ссылки появятся позже.</span></div>
+        </div>
+        <div class="community-mark" aria-hidden="true">A</div>
+      </section>
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-main">
+      <span class="footer-brand">ASHFALL<span>.</span></span>
+      <span>ИГРОВОЙ ПРОЕКТ NIGHTWELL</span>
+      <a href="#top">НАВЕРХ ↑</a>
+    </div>
+    <div class="footer-line"><span>© NIGHTWELL · ASHFALL</span><span>ОФИЦИАЛЬНЫЙ САЙТ</span><span id="update-time">IN DEVELOPMENT</span></div>
+  </footer>
+</body>
+</html>
