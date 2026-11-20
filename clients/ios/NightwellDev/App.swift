@@ -23,8 +23,13 @@ struct HeaderLabel: View {
     let caption: String
     var body: some View {
         VStack(alignment: .leading, spacing: 5) {
-            Text(caption.uppercased()).font(.system(size: 10, weight: .bold, design: .rounded)).tracking(1.7).foregroundStyle(Palette.muted)
-            Text(title).font(.system(size: 31, weight: .bold, design: .rounded)).tracking(-1.2)
+            Text(caption.uppercased())
+                .font(.system(size: 10, weight: .bold, design: .rounded))
+                .tracking(1.5).foregroundStyle(Palette.muted)
+                .lineLimit(1).minimumScaleFactor(0.7)
+            Text(title)
+                .font(.system(size: 31, weight: .bold, design: .rounded))
+                .tracking(-1.2).lineLimit(2).minimumScaleFactor(0.85)
         }.frame(maxWidth: .infinity, alignment: .leading)
     }
 }
@@ -53,13 +58,17 @@ struct NightwellDevApp: App {
     @StateObject private var store = DevStore()
     var body: some Scene {
         WindowGroup {
-            Group {
-                if store.signedIn { AppTabs() } else { LoginScreen() }
+            ZStack {
+                // Keep the canvas edge-to-edge; the views still respect the notch and home indicator.
+                Palette.background.ignoresSafeArea()
+                Group {
+                    if store.signedIn { AppTabs() } else { LoginScreen() }
+                }
             }
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
             .environmentObject(store)
             .preferredColorScheme(.dark)
             .tint(.white)
-            .background(Palette.background)
         }
     }
 }
@@ -117,11 +126,13 @@ struct LoginScreen: View {
 
 struct AppTabs: View {
     var body: some View {
+        // Short labels avoid colliding in the native iOS floating tab bar.
+        // Every destination retains its full title in the navigation bar.
         TabView {
             NavigationStack { OverviewScreen() }
                 .tabItem { Label("Главная", systemImage: "house.fill") }
             NavigationStack { GameInformationScreen() }
-                .tabItem { Label("Информация", systemImage: "info.circle.fill") }
+                .tabItem { Label("Инфо", systemImage: "info.circle.fill") }
             NavigationStack { JournalScreen() }
                 .tabItem { Label("Дневник", systemImage: "book.pages") }
             NavigationStack { TasksScreen() }
