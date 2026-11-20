@@ -21,5 +21,8 @@ urlpatterns = [
     path("information/events/<int:pk>/edit/", views.event_edit, name="event_edit"),
     path("information/<int:pk>/characters/new/", views.character_create, name="character_create"),
     path("information/characters/<int:pk>/edit/", views.character_edit, name="character_edit"),
+    path("player-site/", views.player_site_editor, name="player_site_editor"),
+    path("player-site/news/new/", views.player_news_create, name="player_news_create"),
+    path("player-site/news/<int:pk>/edit/", views.player_news_edit, name="player_news_edit"),
     path("search/", views.search, name="search"),
 ]
