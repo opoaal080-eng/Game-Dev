@@ -39,3 +39,24 @@ class NativeRoutesTests(TestCase):
         self.assertEqual(self.client.get(reverse("native_me"), **headers).status_code, 200)
         self.assertEqual(self.client.post(reverse("native_logout"), **headers).status_code, 200)
         self.assertEqual(self.client.get(reverse("native_me"), **headers).status_code, 401)
+
+
+    def test_github_pages_api_preflight_and_credentials(self):
+        preflight = self.client.options(
+            reverse("native_login"),
+            HTTP_ORIGIN="https://opoaal080-eng.github.io",
+            HTTP_ACCESS_CONTROL_REQUEST_METHOD="POST",
+            HTTP_ACCESS_CONTROL_REQUEST_HEADERS="content-type",
+        )
+        self.assertEqual(preflight.status_code, 204)
+        self.assertEqual(preflight["Access-Control-Allow-Origin"], "https://opoaal080-eng.github.io")
+        self.assertIn("Content-Type", preflight["Access-Control-Allow-Headers"])
+        self.assertNotIn("Access-Control-Allow-Credentials", preflight)
+
+        unauthorized = self.client.get(reverse("native_me"), HTTP_ORIGIN="https://opoaal080-eng.github.io")
+        self.assertEqual(unauthorized.status_code, 401)
+        self.assertEqual(unauthorized["Access-Control-Allow-Origin"], "https://opoaal080-eng.github.io")
+
+        other_site = self.client.get(reverse("native_me"), HTTP_ORIGIN="https://untrusted.example")
+        self.assertEqual(other_site.status_code, 401)
+        self.assertNotIn("Access-Control-Allow-Origin", other_site)
