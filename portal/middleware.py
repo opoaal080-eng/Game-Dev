@@ -6,7 +6,7 @@ class PrivateContentMiddleware:
 
     def __call__(self, request):
         response = self.get_response(request)
-        if not request.path.startswith("/static/"):
+        if not (request.path.startswith("/static/") or request.path.startswith("/api/public/") or request.path.startswith("/ashfall/")):
             response["Cache-Control"] = "private, no-store, max-age=0"
             response["Pragma"] = "no-cache"
         return response
@@ -28,6 +28,10 @@ class NativePagesCORSMiddleware:
         self.get_response = get_response
 
     def __call__(self, request):
+        if request.path.startswith("/api/public/"):
+            response = self.get_response(request)
+            response["Access-Control-Allow-Origin"] = "*"
+            return response
         if not request.path.startswith("/api/v1/"):
             return self.get_response(request)
 
