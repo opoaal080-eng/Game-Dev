@@ -71,6 +71,20 @@ class PortalAccessTests(TestCase):
     def test_no_public_registration(self):
         self.assertEqual(self.client.get("/register/").status_code, 404)
 
+    def test_developer_can_change_own_password(self):
+        self.assertEqual(self.client.get(reverse("password_change")).status_code, 302)
+        self.client.force_login(self.developer)
+        response = self.client.post(reverse("password_change"), {
+            "old_password": "strong test password 123",
+            "new_password1": "new powerful password 456 789",
+            "new_password2": "new powerful password 456 789",
+        })
+        self.assertRedirects(response, reverse("password_change_done"))
+        self.developer.refresh_from_db()
+        self.assertTrue(self.developer.check_password("new powerful password 456 789"))
+        self.assertEqual(self.client.get(reverse("password_change_done")).status_code, 200)
+
+
 
 class PrivateFilesTests(TestCase):
     def setUp(self):
