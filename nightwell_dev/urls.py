@@ -7,6 +7,7 @@ admin.site.site_title = "Nightwell Dev"
 admin.site.index_title = "Администрирование"
 
 urlpatterns = [
+    path("api/v1/", include("portal.api_urls")),
     path("control/", admin.site.urls),
     path("login/", auth_views.LoginView.as_view(template_name="registration/login.html", redirect_authenticated_user=True), name="login"),
     path("logout/", auth_views.LogoutView.as_view(), name="logout"),
