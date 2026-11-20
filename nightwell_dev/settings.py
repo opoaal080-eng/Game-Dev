@@ -75,7 +75,9 @@ ASGI_APPLICATION = "nightwell_dev.asgi.application"
 url = os.getenv("DATABASE_URL", "").strip()
 if not url:
     (BASE_DIR / "var").mkdir(parents=True, exist_ok=True)
-    DATABASES = {"default": {"ENGINE": "django.db.backends.sqlite3", "NAME": BASE_DIR / "var" / "dev.sqlite3"}}
+    if os.getenv("SQLITE_PATH"):
+        Path(os.environ["SQLITE_PATH"]).expanduser().resolve().parent.mkdir(parents=True, exist_ok=True)
+    DATABASES = {"default": {"ENGINE": "django.db.backends.sqlite3", "NAME": Path(os.getenv("SQLITE_PATH") or (BASE_DIR / "var" / "dev.sqlite3")).resolve()}}
 else:
     parsed = urlparse(url)
     if parsed.scheme not in {"postgresql", "postgres"} or not parsed.hostname or not parsed.path.strip("/"):
