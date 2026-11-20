@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 from django.contrib.auth.models import User
-from .models import Asset, Post, Profile, Project, Task
+from .models import Asset, Post, Profile, Project, Task, GameInfo, GameEvent, GameCharacter, AppSession
 
 
 class ProfileInline(admin.StackedInline):
@@ -43,3 +43,33 @@ class TaskAdmin(admin.ModelAdmin):
 class AssetAdmin(admin.ModelAdmin):
     list_display = ["title", "project", "uploaded_by", "size", "created_at"]
     list_filter = ["project"]
+
+
+@admin.register(GameInfo)
+class GameInfoAdmin(admin.ModelAdmin):
+    list_display = ["project", "genre", "development_status", "updated_at"]
+    search_fields = ["project__title", "title", "genre"]
+
+
+@admin.register(GameEvent)
+class GameEventAdmin(admin.ModelAdmin):
+    list_display = ["title", "project", "chapter", "kind", "order", "spoiler"]
+    list_filter = ["project", "kind", "spoiler"]
+    ordering = ["project", "order"]
+    search_fields = ["title", "description", "summary"]
+
+
+@admin.register(GameCharacter)
+class GameCharacterAdmin(admin.ModelAdmin):
+    list_display = ["name", "project", "role", "faction", "order"]
+    list_filter = ["project"]
+    search_fields = ["name", "bio"]
+
+
+@admin.register(AppSession)
+class AppSessionAdmin(admin.ModelAdmin):
+    list_display = ["user", "device_name", "created_at", "expires_at", "last_used_at"]
+    readonly_fields = ["user", "token_hash", "device_name", "created_at", "expires_at", "last_used_at"]
+    list_filter = ["user"]
+    def has_add_permission(self, request):
+        return False
