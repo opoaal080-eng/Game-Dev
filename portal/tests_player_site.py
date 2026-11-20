@@ -77,7 +77,7 @@ class AshfallPublicSiteTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertIn(b"ASHFALL", response.content)
         self.assertEqual(
-            self.client.get("/", HTTP_HOST="nightwell-dev-web-production.up.railway.app").status_code,
+            self.client.get("/").status_code,
             302
         )
 
