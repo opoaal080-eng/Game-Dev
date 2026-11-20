@@ -14,6 +14,11 @@ jobs:
         run: python -m pip install -r requirements.txt
       - name: Validate GitHub Pages JavaScript
         run: node --check pages/app.js
+      - name: Validate ASHFALL public website
+        run: |
+          node --check static/player/site.js
+          python -m py_compile deploy/ashfall_server.py portal/public_site.py
+          python -m json.tool ashfall/data/public.json >/dev/null
       - name: Run Django tests
         run: |
           export DJANGO_SECRET_KEY=$(python -c 'import secrets; print(secrets.token_urlsafe(64))')
@@ -54,3 +59,29 @@ jobs:
           website=$(curl -sS --max-time 20 -o /dev/null -w "%{http_code}" "$base/information/")
           echo "Unauthenticated game information status: $website"
           test "$website" = "302"
+
+      - name: Verify public ASHFALL service and published data
+        run: |
+          set -e
+          public="https://ashfall-public-website-production.up.railway.app"
+          for i in $(seq 1 8); do
+            status=$(curl -sSL --max-time 15 -o /tmp/ashfall-page.html -w "%{http_code}" "$public/" || true)
+            echo "ASHFALL public homepage attempt $i: HTTP $status"
+            if [ "$status" = 200 ] && grep -q "ASHFALL" /tmp/ashfall-page.html; then
+              break
+            fi
+            sleep 5
+          done
+          test "$status" = 200
+          api_status=$(curl -sSL --max-time 15 -o /tmp/ashfall-public.json -w "%{http_code}" "https://nightwell-dev-web-production.up.railway.app/api/public/ashfall/")
+          echo "ASHFALL public JSON: HTTP $api_status"
+          test "$api_status" = 200
+          python - <<'PY'
+          import json
+          with open('/tmp/ashfall-public.json', encoding='utf-8') as f:
+              doc = json.load(f)
+          assert doc['schema'] == 1
+          assert doc['title'] == 'ASHFALL'
+          assert 'news' in doc
+          print('Public ASHFALL JSON verified')
+          PY
