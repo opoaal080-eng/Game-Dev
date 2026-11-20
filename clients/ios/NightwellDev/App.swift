@@ -9,7 +9,8 @@ private enum Palette {
 }
 
 struct GlassCard<Content: View>: View {
-    @ViewBuilder let content: Content
+    let content: Content
+    init(@ViewBuilder content: () -> Content) { self.content = content() }
     var body: some View {
         content.padding(18).frame(maxWidth: .infinity, alignment: .leading)
             .background(Palette.tile, in: RoundedRectangle(cornerRadius: 24, style: .continuous))
@@ -320,7 +321,8 @@ struct BibleEditor: View {
     var body: some View {
         NavigationStack {
             Form {
-                ForEach(names, id: \.0) { item in
+                ForEach(names.indices, id: \.self) { index in
+                    let item = names[index]
                     Section(item.1) {
                         if item.2 {
                             TextEditor(text: binding(item.0)).frame(minHeight: 94)
@@ -501,13 +503,21 @@ struct PostEditor: View {
 struct TasksScreen: View {
     @EnvironmentObject var store: DevStore
     @State private var showEditor = false
+    private func statusLabel(_ value: String) -> String {
+        switch value {
+        case "todo": return "К выполнению"
+        case "progress": return "В работе"
+        case "review": return "На проверке"
+        default: return "Готово"
+        }
+    }
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 17) {
                 HeaderLabel(title: "Задачи.", caption: "ДОСКА РАЗРАБОТКИ")
-                ForEach([("todo", "К выполнению"), ("progress", "В работе"), ("review", "На проверке"), ("done", "Готово")], id: \.0) { item in
-                    Text(item.1).font(.title3.bold()).padding(.top, 5)
-                    ForEach(store.tasks.filter { $0.status == item.0 }) { task in
+                ForEach(["todo", "progress", "review", "done"], id: \.self) { code in
+                    Text(statusLabel(code)).font(.title3.bold()).padding(.top, 5)
+                    ForEach(store.tasks.filter { $0.status == code }) { task in
                         GlassCard {
                             VStack(alignment: .leading, spacing: 9) {
                                 Text(task.title).font(.headline)
@@ -519,8 +529,8 @@ struct TasksScreen: View {
                                     if store.user?.can_write == true &&
                                         (store.user?.role == "admin" || store.user?.id == task.created_by_id || store.user?.id == task.assignee_id) {
                                         Menu {
-                                            ForEach([("todo", "К выполнению"), ("progress", "В работе"), ("review", "На проверке"), ("done", "Готово")], id: \.0) { value in
-                                                Button(value.1) { Task { try? await store.updateTask(task, status: value.0) } }
+                                            ForEach(["todo", "progress", "review", "done"], id: \.self) { value in
+                                                Button(statusLabel(value)) { Task { try? await store.updateTask(task, status: value) } }
                                             }
                                         } label: {
                                             Label("Статус", systemImage: "chevron.down").font(.caption)
