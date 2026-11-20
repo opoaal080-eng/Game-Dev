@@ -15,4 +15,9 @@ urlpatterns = [
     path("files/", api.files, name="native_files"),
     path("files/<int:pk>/download/", api.file_download, name="native_file_download"),
     path("team/", api.team, name="native_team"),
+    path("information/<int:pk>/", api.information, name="native_information"),
+    path("information/<int:pk>/events/", api.create_event, name="native_event_create"),
+    path("information/events/<int:pk>/", api.update_event, name="native_event_update"),
+    path("information/<int:pk>/characters/", api.create_character, name="native_character_create"),
+    path("information/characters/<int:pk>/", api.update_character, name="native_character_update"),
 ]
