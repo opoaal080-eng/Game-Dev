@@ -1,0 +1,74 @@
+/* Nightwell Dev: game bible */
+.bible-title .btn{align-self:center}
+.bible-filter{margin-bottom:16px}
+.bible-hero{position:relative;overflow:hidden;isolation:isolate;padding:34px;border:1px solid #ffffff27;border-radius:29px;background:radial-gradient(ellipse 53% 130% at 90% 2%,#dee4f71e,transparent 80%),linear-gradient(120deg,#222329,#101113 71%);box-shadow:inset 0 1px #ffffff28;margin-bottom:18px}
+.bible-heading{display:flex;align-items:center;justify-content:space-between;position:relative;z-index:1}
+.bible-heading h2{font-size:clamp(29px,4vw,49px);letter-spacing:-1.5px;margin:12px 0 8px;font-weight:730}
+.bible-heading p{color:#b5b7c0;font-size:13px;line-height:1.6;max-width:700px;margin:0}
+.bible-symbol{font-size:170px;font-weight:1000;opacity:.08;line-height:1;transform:rotate(-12deg)}
+.bible-metadata{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;position:relative;margin-top:38px}
+.bible-metadata>div{display:flex;flex-direction:column;gap:7px;min-width:0;border:1px solid #ffffff18;border-radius:16px;background:#ffffff0d;padding:15px 16px}
+.bible-metadata small{color:#989ca6;font-size:9px;letter-spacing:1.3px;font-weight:800}
+.bible-metadata strong{font-size:13px;overflow-wrap:anywhere;font-weight:600}
+.bible-chips{display:flex;gap:8px;overflow:auto;scrollbar-width:none;padding:3px 2px 18px;margin-bottom:3px}
+.bible-chips::-webkit-scrollbar{display:none}
+.bible-chips a{white-space:nowrap;background:#ffffff0e;border:1px solid #ffffff21;padding:10px 15px;border-radius:20px;font-size:12px;color:#d6dae1}
+.bible-chips a:hover{background:#ffffff24;color:#fff}
+.bible-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+.bible-panel{background:linear-gradient(140deg,#ffffff13,#ffffff06);border:1px solid #ffffff20;border-radius:24px;padding:28px;min-width:0}
+.bible-large{grid-column:1/-1}
+.bible-panel-head{display:flex;align-items:center;gap:15px}
+.bible-panel-head h3{font-size:22px;letter-spacing:-.5px;margin:4px 0 0}
+.bible-pictogram{display:flex;align-items:center;justify-content:center;width:44px;height:44px;flex:none;border-radius:15px;background:#ffffff16;border:1px solid #ffffff12;font-size:13px;font-weight:750;color:#fff}
+.bible-panel .markdown-body{padding-top:16px;font-size:13px;line-height:1.8}
+.bible-muted,.bible-empty{color:#9197a0;font-size:13px;line-height:1.8}
+.bible-section{margin-top:34px;scroll-margin-top:102px}
+.bible-panel{scroll-margin-top:100px}
+.bible-section-head{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:18px}
+.bible-section-head h2{margin:5px 0 5px;font-size:clamp(27px,3vw,36px);letter-spacing:-1px}
+.bible-section-head p{margin:0;color:#979ca5;font-size:12px}
+.bible-timeline{position:relative;padding-left:14px}
+.bible-timeline:before{content:"";position:absolute;top:12px;bottom:15px;left:29px;width:1px;background:linear-gradient(#ffffff7a,#ffffff0b)}
+.bible-event{position:relative;display:flex;align-items:flex-start;gap:23px;margin-bottom:15px}
+.bible-timeline-number{position:relative;z-index:1;flex:none;width:31px;height:31px;display:grid;place-items:center;border-radius:50%;background:#e9ebef;color:#141516;font-size:11px;font-weight:800;box-shadow:0 0 0 6px #111216}
+.bible-event-content{width:100%;min-width:0;padding:22px 24px;border-radius:22px;background:linear-gradient(150deg,#ffffff13,#ffffff05);border:1px solid #ffffff18}
+.bible-event-meta{display:flex;flex-wrap:wrap;gap:7px}
+.bible-event-content h3{font-size:19px;letter-spacing:-.4px;margin:14px 0 8px}
+.bible-event-content>p{color:#b4b8bf;font-size:13px;line-height:1.7;white-space:normal}
+.bible-event-facts{display:flex;flex-wrap:wrap;gap:9px;margin:16px 0 0}
+.bible-event-facts>span{border:1px solid #ffffff13;background:#ffffff0a;padding:5px 10px;border-radius:9px;font-size:11px;color:#a8aeb7}
+.bible-details{margin-top:15px;border-top:1px solid #ffffff16;padding-top:13px;font-size:13px}
+.bible-details summary{cursor:pointer;font-weight:650;color:#e2e4e9;list-style:none}
+.bible-details summary::after{content:"＋";margin-left:9px;color:#a4a9b0}
+.bible-details[open] summary::after{content:"−"}
+.bible-details h4{margin:15px 0 3px}
+.bible-edit{display:inline-block;margin-top:15px;font-size:12px;color:#e5e6ea;font-weight:680}
+.bible-no-items{width:100%;color:#d6d8df;text-align:center;border:1px dashed #ffffff28;border-radius:22px;padding:40px 20px;background:#ffffff05}
+.bible-no-items span{font-size:17px;font-weight:660}
+.bible-no-items p{font-size:12px;color:#9197a1;max-width:360px;margin:9px auto 0}
+.bible-character-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:14px}
+.bible-character{display:flex;gap:15px;align-items:flex-start;padding:21px;border-radius:23px;background:linear-gradient(140deg,#ffffff11,#ffffff05);border:1px solid #ffffff20}
+.bible-avatar{flex:none;width:53px;height:53px;display:grid;place-items:center;border:1px solid #ffffff28;border-radius:17px;background:linear-gradient(135deg,#656870,#222428);font-size:23px;font-weight:780}
+.bible-character-details{min-width:0;flex:1}
+.bible-character-details h3{font-size:17px;margin:5px 0;overflow-wrap:anywhere}
+.bible-character-details p{font-size:12px;color:#b3b7bd;line-height:1.65}
+.bible-faction{color:#a5aab2;font-size:11px}
+.bible-character .bible-details{max-width:100%;overflow-wrap:anywhere}
+@media(max-width:760px){
+.bible-title .btn{align-self:stretch}
+.bible-hero{padding:25px 20px;border-radius:24px}
+.bible-symbol{font-size:110px}
+.bible-heading h2{font-size:31px}
+.bible-metadata{grid-template-columns:repeat(2,minmax(0,1fr));margin-top:24px;gap:9px}
+.bible-metadata>div{padding:12px}
+.bible-grid{grid-template-columns:1fr;gap:12px}
+.bible-large{grid-column:auto}
+.bible-panel{padding:21px;border-radius:21px}
+.bible-section{margin-top:26px;scroll-margin-top:85px}
+.bible-section-head{align-items:flex-start;flex-direction:column}
+.bible-event{gap:16px}
+.bible-event-content{padding:19px 17px}
+.bible-timeline{padding-left:7px}
+.bible-timeline:before{left:22px}
+.bible-character-grid{grid-template-columns:1fr}
+}
