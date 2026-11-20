@@ -1,0 +1,54 @@
+{% load static %}
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#101014">
+  <meta name="robots" content="noindex,nofollow,noarchive">
+  <title>{% block title %}Nightwell Dev{% endblock %} · Nightwell</title>
+  <link rel="icon" href="{% static 'img/favicon.svg' %}" type="image/svg+xml">
+  <link rel="stylesheet" href="{% static 'css/app.css' %}">
+  <script src="{% static 'js/app.js' %}" defer></script>
+</head>
+<body>
+<div class="app">
+  <aside class="sidebar" id="sidebar">
+    <a class="brand" href="{% url 'dashboard' %}" aria-label="На главную">
+      <span class="brand-mark">N</span>
+      <span class="brand-copy"><b>NIGHTWELL</b><small>DEVELOPER SPACE</small></span>
+    </a>
+    <div class="workspace-label"><span class="online-dot"></span> PRIVATE WORKSPACE</div>
+    <nav class="side-nav" aria-label="Главное меню">
+      <span class="nav-label">ПРОСТРАНСТВО</span>
+      <a href="{% url 'dashboard' %}" class="nav-link {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}"><span class="nav-ico">⌂</span> Обзор</a>
+      <a href="{% url 'posts' %}" class="nav-link {% if request.resolver_match.url_name == 'posts' or request.resolver_match.url_name == 'post_detail' or request.resolver_match.url_name == 'post_create' or request.resolver_match.url_name == 'post_edit' %}active{% endif %}"><span class="nav-ico">≡</span> Дневник разработки</a>
+      <a href="{% url 'docs' %}" class="nav-link {% if request.resolver_match.url_name == 'docs' %}active{% endif %}"><span class="nav-ico">▤</span> Документация</a>
+      <a href="{% url 'tasks' %}" class="nav-link {% if request.resolver_match.url_name == 'tasks' or request.resolver_match.url_name == 'task_create' or request.resolver_match.url_name == 'task_edit' %}active{% endif %}"><span class="nav-ico">☷</span> Задачи</a>
+      <a href="{% url 'assets' %}" class="nav-link {% if request.resolver_match.url_name == 'assets' or request.resolver_match.url_name == 'asset_create' %}active{% endif %}"><span class="nav-ico">▣</span> Файлы</a>
+      <span class="nav-label second">КОМАНДА</span>
+      <a href="{% url 'team' %}" class="nav-link {% if request.resolver_match.url_name == 'team' %}active{% endif %}"><span class="nav-ico">♧</span> Участники</a>
+      {% if is_workspace_admin %}<a href="{% url 'admin:index' %}" class="nav-link"><span class="nav-ico">⚙</span> Администрирование</a>{% endif %}
+    </nav>
+    <div class="sidebar-bottom">
+      <div class="profile"><div class="avatar">{{ request.user.username|slice:':1'|upper }}</div><div class="profile-copy"><strong>{{ request.user.get_full_name|default:request.user.username }}</strong><span>{% if workspace_role == 'admin' %}Администратор{% elif workspace_role == 'developer' %}Разработчик{% else %}Наблюдатель{% endif %}</span></div></div>
+      <form action="{% url 'logout' %}" method="post">{% csrf_token %}<button type="submit" class="logout" title="Выйти из аккаунта">Выйти ↗</button></form>
+    </div>
+  </aside>
+  <main class="main">
+    <header class="topbar">
+      <button class="mobile-menu" type="button" aria-label="Открыть меню" aria-expanded="false" aria-controls="sidebar" id="menuToggle">☰</button>
+      <span class="crumb">NIGHTWELL <span>/</span> {% block crumb %}WORKSPACE{% endblock %}</span>
+      <form class="search" action="{% url 'search' %}" method="get"><span class="search-icon">⌕</span><input type="search" name="q" value="{{ request.GET.q|default:'' }}" placeholder="Поиск по пространству" aria-label="Поиск"><kbd>/</kbd></form>
+      <div class="topbar-user">{{ request.user.username|slice:':1'|upper }}</div>
+    </header>
+    <div class="main-content">
+      {% if messages %}<div class="alerts" role="status">{% for message in messages %}<div class="alert">{{ message }}</div>{% endfor %}</div>{% endif %}
+      {% block content %}{% endblock %}
+      <footer class="footer"><span>© Nightwell Dev · Закрытое пространство</span><span>v0.1 · INTERNAL</span></footer>
+    </div>
+  </main>
+  <div class="overlay" id="overlay"></div>
+</div>
+</body>
+</html>

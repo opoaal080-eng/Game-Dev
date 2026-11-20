@@ -1,0 +1,6 @@
+{% extends 'base.html' %}
+{% block title %}Команда{% endblock %}{% block crumb %}КОМАНДА{% endblock %}
+{% block content %}
+<div class="page-head"><div><span class="eyebrow">УЧАСТНИКИ ПРОЕКТА</span><h1>Наша команда<span class="accent">.</span></h1><p>Люди, которые делают проект реальностью.</p></div>{% if is_workspace_admin %}<a class="btn btn-primary" href="{% url 'admin:auth_user_add' %}">＋ Добавить участника</a>{% endif %}</div>
+<div class="team-grid">{% for member in members %}<div class="member-card"><div class="member-avatar">{{ member.username|slice:':1'|upper }}</div><h3>{{ member.get_full_name|default:member.username }}</h3><span class="member-handle">@{{ member.username }}</span><span class="tag tag-purple">{% if member.is_staff or member.is_superuser or member.dev_profile.role == 'admin' %}Администратор{% elif member.dev_profile.role == 'developer' %}Разработчик{% else %}Наблюдатель{% endif %}</span><p>{{ member.dev_profile.job_title|default:'Участник команды' }}</p></div>{% empty %}<p>Пока нет участников.</p>{% endfor %}</div>
+{% endblock %}

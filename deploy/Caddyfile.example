@@ -1,0 +1,10 @@
+# Отдельный HTTPS прокси: Caddy автоматически запрашивает сертификат.
+# Домен должен указывать на ваш сервер. Порт 8000 слушает только localhost.
+dev.nightwell.fun {
+    encode zstd gzip
+    reverse_proxy 127.0.0.1:8000
+    header {
+        X-Content-Type-Options nosniff
+        Referrer-Policy same-origin
+    }
+}
