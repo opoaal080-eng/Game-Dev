@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#090a0d">
+<meta name="robots" content="noindex,nofollow,noarchive">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Nightwell Dev">
+<title>Nightwell Dev · Пространство команды</title>
+<link rel="stylesheet" href="./pages/app.css">
+<script defer src="./pages/app.js"></script>
+</head>
+<body>
+<div id="login-screen" class="auth-screen">
+  <div class="auth-art">
+    <div class="brand brand--large"><span class="mark">N</span><span><b>NIGHTWELL</b><small>DEVELOPER SPACE</small></span></div>
+    <div class="auth-glow" aria-hidden="true">N</div>
+    <div class="auth-phrase"><span class="overline">PRIVATE WORKSPACE / NIGHTWELL</span><h1>Там, где<br>создаются миры<span class="accent">.</span></h1><p>История игры, разработка и вся команда. Одно пространство.</p></div>
+  </div>
+  <div class="auth-form-wrap">
+    <div class="auth-box">
+      <div class="auth-lock" aria-hidden="true">✦</div>
+      <div class="overline">ДОСТУП ПО ПРИГЛАШЕНИЮ</div>
+      <h2>С возвращением.</h2>
+      <p class="muted">Войди под учётной записью Nightwell Dev.</p>
+      <form id="login-form" autocomplete="on">
+        <label for="username">Логин</label>
+        <input id="username" name="username" type="text" autocomplete="username" required maxlength="150" placeholder="Имя пользователя">
+        <label for="password">Пароль</label>
+        <input id="password" name="password" type="password" autocomplete="current-password" required placeholder="Введите пароль">
+        <button class="btn btn-primary btn-wide" id="login-button" type="submit"><span>Войти в пространство</span><span aria-hidden="true">↗</span></button>
+      </form>
+      <p class="notice" id="login-error" role="alert" hidden></p>
+      <div class="auth-footnote">Нет публичной регистрации. Доступ выдаёт администратор.</div>
+      <div class="server-footnote">Интерфейс загружается через GitHub Pages. Аккаунты и личные материалы проверяются отдельно сервером.</div>
+    </div>
+  </div>
+</div>
+<div id="workspace" class="workspace" hidden>
+  <aside class="sidebar" aria-label="Разделы Nightwell Dev">
+    <div class="brand"><span class="mark">N</span><span><b>NIGHTWELL</b><small>DEVELOPER SPACE</small></span></div>
+    <div class="workspace-pill"><span class="online-dot"></span> PRIVATE WORKSPACE</div>
+    <span class="nav-title">ПРОСТРАНСТВО</span>
+    <nav class="side-links" id="side-nav">
+      <button type="button" data-view="home" class="nav-button active"><span class="nav-glyph">⌂</span> Главная</button>
+      <button type="button" data-view="info" class="nav-button"><span class="nav-glyph">ⓘ</span> Информация</button>
+      <button type="button" data-view="journal" class="nav-button"><span class="nav-glyph">▤</span> Дневник</button>
+      <button type="button" data-view="docs" class="nav-button"><span class="nav-glyph">≡</span> Документация</button>
+      <button type="button" data-view="tasks" class="nav-button"><span class="nav-glyph">☷</span> Задачи</button>
+      <button type="button" data-view="files" class="nav-button"><span class="nav-glyph">▣</span> Файлы</button>
+      <button type="button" data-view="team" class="nav-button"><span class="nav-glyph">♧</span> Команда</button>
+    </nav>
+    <div class="sidebar-bottom">
+      <div class="member"><span class="member-avatar" id="user-avatar">N</span><span><b id="sidebar-username">Разработчик</b><small id="sidebar-role">Разработчик</small></span></div>
+      <button class="nav-button" data-action="password" type="button"><span class="nav-glyph">⚿</span> Сменить пароль</button>
+      <button class="nav-button" data-action="logout" type="button"><span class="nav-glyph">↪</span> Выйти</button>
+    </div>
+  </aside>
+  <main class="main">
+    <header class="topbar">
+      <span class="top-title">NIGHTWELL <span class="top-dim">/ DEV</span></span>
+      <span class="top-label" id="top-label">Главная</span>
+      <div class="top-actions"><select id="project-picker" aria-label="Выбрать проект" title="Текущий проект"></select><button id="refresh" type="button" aria-label="Обновить данные" title="Обновить">↻</button><span class="top-avatar" id="top-avatar">N</span></div>
+    </header>
+    <div class="content" id="content" aria-live="polite"></div>
+    <footer class="footer">NIGHTWELL DEV · PRIVATE WORKSPACE · GITHUB PAGES</footer>
+  </main>
+  <nav class="mobile-dock" aria-label="Быстрая навигация">
+    <button type="button" data-view="home" class="active"><span class="dock-icon">⌂</span>Главная</button>
+    <button type="button" data-view="info"><span class="dock-icon">ⓘ</span>Инфо</button>
+    <button type="button" data-view="journal"><span class="dock-icon">▤</span>Дневник</button>
+    <button type="button" data-view="tasks"><span class="dock-icon">☷</span>Задачи</button>
+    <button type="button" data-view="files"><span class="dock-icon">▣</span>Файлы</button>
+    <button type="button" id="more-button"><span class="dock-icon">☰</span>Ещё</button>
+  </nav>
+  <div id="mobile-shade" class="mobile-shade" hidden></div>
+  <div id="mobile-sheet" class="mobile-sheet" hidden>
+    <div class="sheet-grab"></div>
+    <div class="sheet-head">Nightwell Dev <button type="button" id="close-sheet" aria-label="Закрыть">✕</button></div>
+    <button type="button" data-view="docs">Документация</button>
+    <button type="button" data-view="team">Команда</button>
+    <button type="button" data-action="password">Сменить пароль</button>
+    <button type="button" data-action="logout">Выйти</button>
+  </div>
+</div>
+<div id="modal-backdrop" class="modal-backdrop" hidden>
+  <section class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+    <header class="modal-header"><h2 id="modal-title"></h2><button type="button" id="close-modal" aria-label="Закрыть окно">✕</button></header>
+    <form id="modal-form"><div id="modal-fields"></div><p id="modal-error" class="notice" hidden></p><div class="modal-actions"><button class="btn btn-secondary" type="button" id="cancel-modal">Отмена</button><button class="btn btn-primary" type="submit" id="save-modal">Сохранить</button></div></form>
+  </section>
+</div>
+<div id="toast" class="toast" role="status" hidden></div>
+</body>
+</html>
