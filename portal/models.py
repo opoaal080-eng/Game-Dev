@@ -132,3 +132,21 @@ class Asset(models.Model):
     @property
     def download_name(self):
         return os.path.basename(self.original_name) or "attachment"
+
+
+class AppSession(models.Model):
+    """Revocable native-app access token. Only its SHA-256 digest is stored."""
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="native_sessions")
+    token_hash = models.CharField(max_length=64, unique=True, db_index=True)
+    device_name = models.CharField(max_length=100, blank=True)
+    created_at = models.DateTimeField(default=timezone.now)
+    expires_at = models.DateTimeField()
+    last_used_at = models.DateTimeField(default=timezone.now)
+
+    class Meta:
+        ordering = ["-created_at"]
+        verbose_name = "Сессия приложения"
+        verbose_name_plural = "Сессии приложений"
+
+    def __str__(self):
+        return f"{self.user.username} · {self.device_name or 'Устройство'}"
