@@ -14,7 +14,7 @@ internal sealed class Backend
     private string? token;
     public string Username { get; private set; } = "";
     public string Role { get; private set; } = "";
-    public int ProjectId { get; private set; }
+    public int ProjectId { get; set; }
     public JsonArray Projects { get; private set; } = new();
     public JsonObject Counts { get; private set; } = new();
     public JsonArray Posts { get; private set; } = new();
