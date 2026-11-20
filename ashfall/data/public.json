@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "published": false,
+  "published": true,
   "title": "ASHFALL",
   "eyebrow": "NIGHTWELL · ИГРОВОЙ ПРОЕКТ",
   "tagline": "",
@@ -20,5 +20,5 @@
   "wishlist_url": "",
   "contact_email": "",
   "news": [],
-  "updated_at": null
+  "updated_at": "2026-11-20T21:26:32.924802+00:00"
 }
