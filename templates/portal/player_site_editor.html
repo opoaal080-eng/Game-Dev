@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+{% block title %}ASHFALL · Сайт для игроков{% endblock %}
+{% block crumb %}ПУБЛИЧНЫЙ САЙТ{% endblock %}
+{% block content %}
+<div class="page-head">
+ <div>
+   <span class="eyebrow">NIGHTWELL DEV / УПРАВЛЕНИЕ ПУБЛИКАЦИЕЙ</span>
+   <h1>ASHFALL<span class="accent">.</span></h1>
+   <p>Здесь редактируется сайт для игроков. Данные из закрытого раздела «Информация» не публикуются автоматически.</p>
+ </div>
+ <a class="btn btn-ghost" href="https://opoaal080-eng.github.io/Game-Dev/ashfall/" target="_blank" rel="noopener noreferrer">Открыть сайт ↗</a>
+</div>
+<div class="panel" style="padding:22px;margin-bottom:22px">
+ <div class="eyebrow">СТАТУС ПУБЛИКАЦИИ</div>
+ <h3 style="margin:12px 0">{% if page.is_published %}Опубликовано для игроков{% else %}Черновик. Содержимое скрыто{% endif %}</h3>
+ <p style="color:#a7abb3;font-size:13px;margin:0">Публикуются только поля этой формы и отмеченные публичные новости. Синхронизация GitHub Pages запускается автоматически по расписанию и может занимать несколько минут.</p>
+</div>
+<div class="form-panel">
+ <form class="editor-form" method="post" autocomplete="off">
+   {% csrf_token %}
+   {% if form.non_field_errors %}<div class="error-box">{{ form.non_field_errors }}</div>{% endif %}
+   {% for field in form %}
+   <div class="field-row {% if field.field.widget.input_type == 'checkbox' %}field-checkbox{% endif %}">
+     <label for="{{ field.id_for_label }}">{{ field.label }}</label>{{ field }}
+     {% if field.help_text %}<small class="field-help">{{ field.help_text }}</small>{% endif %}
+     {% for error in field.errors %}<span class="field-error">{{ error }}</span>{% endfor %}
+   </div>
+   {% endfor %}
+   <div class="form-actions"><button type="submit" class="btn btn-primary">Сохранить для сайта →</button></div>
+ </form>
+ <aside class="editor-hint">
+    <span class="eyebrow">ASHFALL / ДЛЯ ИГРОКОВ</span>
+    <h3>Что появится на сайте?</h3>
+    <p>Обложка, жанр, статус разработки, описание, завязка истории, особенности, скриншоты, видео, ссылки и новости.</p>
+    <p>Если информация неизвестна, оставь поле пустым: сайт не будет придумывать факты, дату релиза или игровые механики.</p>
+    <p>Для ссылок на обложки, видео и скриншоты используй HTTPS. Внутреннее хранилище файлов Nightwell Dev остаётся закрытым.</p>
+    <p><a href="{% url 'information' %}">Вернуться к внутренней информации →</a></p>
+ </aside>
+</div>
+<div class="page-head" style="margin-top:36px">
+ <div><span class="eyebrow">ПУБЛИЧНЫЕ ОБНОВЛЕНИЯ</span><h2 style="margin:8px 0">Новости ASHFALL</h2><p>На сайте будут видны только новости с включённой публикацией.</p></div>
+ <a href="{% url 'player_news_create' %}" class="btn btn-primary">+ Новость</a>
+</div>
+<div class="article-list">
+ {% for item in news %}
+ <a href="{% url 'player_news_edit' item.pk %}" class="article-card" style="text-decoration:none">
+    <span class="eyebrow">{% if item.is_published %}ОПУБЛИКОВАНО{% else %}ЧЕРНОВИК{% endif %} · {{ item.published_at|date:"d.m.Y" }}</span>
+    <h3>{{ item.title }}</h3>
+    <p>{{ item.summary|default:item.content|truncatechars:170 }}</p>
+    <div class="article-bottom">Редактировать ↗</div>
+ </a>
+ {% empty %}<div class="empty-state">Новостей для игроков пока нет.</div>{% endfor %}
+</div>
+{% endblock %}
