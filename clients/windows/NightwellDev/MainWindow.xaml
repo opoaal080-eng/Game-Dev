@@ -8,14 +8,14 @@
       IsSettingsVisible="False" SelectionChanged="NavigationChanged" Visibility="Collapsed"
       Background="#0C0D10" Foreground="#F5F6F8" PaneTitle="NIGHTWELL DEV">
       <NavigationView.MenuItems>
-        <NavigationViewItem Content="Главная" Tag="home" Icon="Home" />
-        <NavigationViewItem Content="Информация" Tag="info" Icon="Library" />
-        <NavigationViewItem Content="Дневник" Tag="journal" Icon="Document" />
-        <NavigationViewItem Content="Документация" Tag="docs" Icon="Book" />
-        <NavigationViewItem Content="Задачи" Tag="tasks" Icon="List" />
-        <NavigationViewItem Content="Файлы" Tag="files" Icon="Folder" />
-        <NavigationViewItem Content="Команда" Tag="team" Icon="People" />
-        <NavigationViewItem Content="Аккаунт" Tag="account" Icon="Contact" />
+        <NavigationViewItem Content="Главная" Tag="home"><NavigationViewItem.Icon><SymbolIcon Symbol="Home"/></NavigationViewItem.Icon></NavigationViewItem>
+        <NavigationViewItem Content="Информация" Tag="info"><NavigationViewItem.Icon><SymbolIcon Symbol="Library"/></NavigationViewItem.Icon></NavigationViewItem>
+        <NavigationViewItem Content="Дневник" Tag="journal"><NavigationViewItem.Icon><SymbolIcon Symbol="Document"/></NavigationViewItem.Icon></NavigationViewItem>
+        <NavigationViewItem Content="Документация" Tag="docs"><NavigationViewItem.Icon><SymbolIcon Symbol="Book"/></NavigationViewItem.Icon></NavigationViewItem>
+        <NavigationViewItem Content="Задачи" Tag="tasks"><NavigationViewItem.Icon><SymbolIcon Symbol="List"/></NavigationViewItem.Icon></NavigationViewItem>
+        <NavigationViewItem Content="Файлы" Tag="files"><NavigationViewItem.Icon><SymbolIcon Symbol="Folder"/></NavigationViewItem.Icon></NavigationViewItem>
+        <NavigationViewItem Content="Команда" Tag="team"><NavigationViewItem.Icon><SymbolIcon Symbol="People"/></NavigationViewItem.Icon></NavigationViewItem>
+        <NavigationViewItem Content="Аккаунт" Tag="account"><NavigationViewItem.Icon><SymbolIcon Symbol="Contact"/></NavigationViewItem.Icon></NavigationViewItem>
       </NavigationView.MenuItems>
       <ScrollViewer VerticalScrollBarVisibility="Auto">
         <StackPanel x:Name="ContentPanel" Spacing="16" Padding="35,32,35,40"
