@@ -1,4 +1,4 @@
-package fun.nightwell.dev
+package com.nightwell.dev
 
 import android.content.Context
 import android.net.Uri
