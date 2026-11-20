@@ -72,3 +72,9 @@
 .bible-timeline:before{left:22px}
 .bible-character-grid{grid-template-columns:1fr}
 }
+
+@media(max-width:760px){
+.mobile-dock{grid-template-columns:repeat(6,minmax(0,1fr));gap:1px;padding-left:6px;padding-right:6px}
+.mobile-dock a,.mobile-dock button{font-size:9px}
+.mobile-dock svg{width:21px;height:21px}
+}
