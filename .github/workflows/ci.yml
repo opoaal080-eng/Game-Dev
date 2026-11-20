@@ -12,6 +12,8 @@ jobs:
           python-version: '3.12'
       - name: Install requirements
         run: python -m pip install -r requirements.txt
+      - name: Validate GitHub Pages JavaScript
+        run: node --check pages/app.js
       - name: Run Django tests
         run: |
           export DJANGO_SECRET_KEY=$(python -c 'import secrets; print(secrets.token_urlsafe(64))')
