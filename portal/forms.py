@@ -102,7 +102,7 @@ class PublicGamePageForm(forms.ModelForm):
             try:
                 validator = forms.URLField()
                 validator.clean(value)
-            except forms.ValidationError:
+            except ValidationError:
                 self.add_error("screenshots", "Некорректная ссылка на изображение.")
                 break
             if not value.lower().startswith("https://"):
