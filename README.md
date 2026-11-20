@@ -16,6 +16,36 @@
 
 Все данные пока сохраняются в SQLite. На сервере можно использовать PostgreSQL через `DATABASE_URL`. GitHub хранит код, **GitHub Pages этот сайт не запустит**, потому что сайт использует Python и базу данных.
 
+## Размещение настоящего сайта без компьютера (Railway)
+
+GitHub хранит только код. Чтобы Django работал круглосуточно как сайт, потребуется облачный хостинг. Для временного размещения подготовлен `railway.json`. Dockerfile и Docker Compose не используются.
+
+1. Зарегистрируйтесь на [Railway](https://railway.com/) с телефона, подключите GitHub и выберите репозиторий `opoaal080-eng/Game-Dev`, ветку `main` (Create Project / Deploy from GitHub repo).
+2. Добавьте в проект сервис **PostgreSQL**, затем в Variables сайта задайте `DATABASE_URL=${{Postgres.DATABASE_URL}}`. Название `Postgres` должно совпадать с именем сервиса базы в Railway.
+3. Прикрепите к сервису сайта **Volume**, mount path `/data`. Файлы будут храниться в `/data/private_uploads`, а не исчезать при новом деплое.
+4. Добавьте следующие переменные среды веб-сервиса. Реальные секреты вводите только в Railway, не в GitHub:
+
+   | Переменная | Значение |
+   | --- | --- |
+   | `DJANGO_SECRET_KEY` | длинный случайный секрет (не меньше 50 символов) |
+   | `DJANGO_DEBUG` | `false` |
+   | `DJANGO_ALLOWED_HOSTS` | `dev.nightwell.fun` |
+   | `DJANGO_CSRF_TRUSTED_ORIGINS` | `https://dev.nightwell.fun` |
+   | `DJANGO_SECURE_SSL_REDIRECT` | `true` |
+   | `DJANGO_TRUST_PROXY_SSL_HEADER` | `true` |
+   | `PRIVATE_UPLOAD_ROOT` | `/data/private_uploads` |
+   | `BOOTSTRAP_ADMIN_USERNAME` | имя первого администратора |
+   | `BOOTSTRAP_ADMIN_PASSWORD` | уникальный пароль администратора минимум 16 символов |
+   | `BOOTSTRAP_ADMIN_EMAIL` | почта администратора, необязательно |
+
+5. При первом успешном запуске автоматически выполнятся миграции, сбор статики и создание администратора. После входа удалите переменные `BOOTSTRAP_ADMIN_PASSWORD`, `BOOTSTRAP_ADMIN_USERNAME`, `BOOTSTRAP_ADMIN_EMAIL` из Railway и перезапустите сервис. Сама учётная запись останется.
+6. Для начала включите `Generate Domain` в Public Networking и откройте адрес вида `https://....up.railway.app/login/`. В `settings.py` имя выдаваемого Railway домена добавляется автоматически из `RAILWAY_PUBLIC_DOMAIN`.
+7. После проверки сайта в Settings → Networking → Custom Domain добавьте `dev.nightwell.fun`. Railway выдаст **CNAME и TXT**. Создайте обе DNS-записи у своего DNS-провайдера. Не придумывайте CNAME вручную. После подтверждения домена откроется `https://dev.nightwell.fun/login/`.
+
+**Доступ ограничен:** без авторизации страницы и файлы закрыты. Дополнительно ограничьте сайт через Cloudflare Access, если хотите скрыть даже форму входа. Администратору необходимо включить 2FA на аккаунте Railway и GitHub.
+
+**Важные нюансы:** Railway требует отдельного подключения вашего аккаунта и может взимать плату за используемые ресурсы; следите за лимитами. Для защиты данных регулярно выгружайте резервные копии PostgreSQL и каталога `/data/private_uploads`. В случае переноса на собственный сервер сохраните оба источника данных и `DJANGO_SECRET_KEY`, иначе входы и файлы могут перестать работать. Содержимое рабочего портала нельзя хранить в публичном репозитории.
+
 ## 1. Первый запуск (Windows / Linux / macOS)
 
 Нужен **Python 3.11+**. Рекомендуется Python 3.12 или 3.13.
