@@ -1,9 +1,9 @@
 #!/bin/sh
 set -eu
 
-# Never run a writable production portal on an ephemeral SQLite database.
-if [ -z "${DATABASE_URL:-}" ]; then
-    echo "ERROR: DATABASE_URL must point to a persistent PostgreSQL database." >&2
+# Production requires either PostgreSQL or SQLite on the mounted persistent volume.
+if [ -z "${DATABASE_URL:-}" ] && [ "${SQLITE_PATH:-}" != "/data/db/dev.sqlite3" ]; then
+    echo "ERROR: set DATABASE_URL (Postgres) or SQLITE_PATH=/data/db/dev.sqlite3" >&2
     exit 1
 fi
 
