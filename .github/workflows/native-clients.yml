@@ -1,0 +1,85 @@
+name: Native Nightwell Dev clients
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "clients/**"
+      - ".github/workflows/native-clients.yml"
+  pull_request:
+    paths:
+      - "clients/**"
+      - ".github/workflows/native-clients.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  android:
+    name: Android · native APK
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: android-actions/setup-android@v3
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.13'
+      - name: Build Android APK
+        run: gradle -p clients/android :app:assembleDebug --no-daemon
+      - uses: actions/upload-artifact@v4
+        with:
+          name: NightwellDev-Android-APK
+          path: clients/android/app/build/outputs/apk/debug/app-debug.apk
+          if-no-files-found: error
+
+  ios:
+    name: iOS · native SwiftUI (unsigned simulator)
+    runs-on: macos-26
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install XcodeGen
+        run: brew install xcodegen
+      - name: Generate Xcode project
+        run: cd clients/ios && xcodegen generate
+      - name: Compile native iOS app
+        run: |
+          xcodebuild -project clients/ios/NightwellDev.xcodeproj \
+            -scheme NightwellDev -configuration Debug -sdk iphonesimulator \
+            -derivedDataPath "$RUNNER_TEMP/nightwell-ios" \
+            CODE_SIGNING_ALLOWED=NO build
+      - name: Package simulator application
+        run: |
+          cd "$RUNNER_TEMP/nightwell-ios/Build/Products/Debug-iphonesimulator"
+          zip -rq "$RUNNER_TEMP/NightwellDev-iOS-Simulator.zip" NightwellDev.app
+      - uses: actions/upload-artifact@v4
+        with:
+          name: NightwellDev-iOS-Simulator
+          path: ${{ runner.temp }}/NightwellDev-iOS-Simulator.zip
+          if-no-files-found: error
+
+  windows:
+    name: Windows · native WinUI 3
+    runs-on: windows-2025
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+      - name: Publish WinUI 3 executable
+        shell: pwsh
+        run: |
+          dotnet publish clients/windows/NightwellDev/NightwellDev.csproj -c Release -r win-x64 -p:Platform=x64 -p:WindowsPackageType=None -p:WindowsAppSDKSelfContained=true -o "$env:RUNNER_TEMP\nightwell-win"
+      - name: Package native Windows application
+        shell: pwsh
+        run: |
+          Compress-Archive -Path "$env:RUNNER_TEMP\nightwell-win\*" -DestinationPath "$env:RUNNER_TEMP\NightwellDev-Windows.zip" -Force
+      - uses: actions/upload-artifact@v4
+        with:
+          name: NightwellDev-Windows
+          path: ${{ runner.temp }}/NightwellDev-Windows.zip
+          if-no-files-found: error
