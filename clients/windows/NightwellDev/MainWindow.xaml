@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Window
+    x:Class="NightwellDev.MainWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+  <Grid Background="{StaticResource NightwellBackground}">
+    <NavigationView x:Name="MainNav" PaneDisplayMode="Left" IsBackButtonVisible="Collapsed"
+      IsSettingsVisible="False" SelectionChanged="NavigationChanged" Visibility="Collapsed"
+      Background="#0C0D10" Foreground="#F5F6F8" PaneTitle="NIGHTWELL DEV">
+      <NavigationView.MenuItems>
+        <NavigationViewItem Content="Главная" Tag="home" Icon="Home" />
+        <NavigationViewItem Content="Информация" Tag="info" Icon="Library" />
+        <NavigationViewItem Content="Дневник" Tag="journal" Icon="Document" />
+        <NavigationViewItem Content="Документация" Tag="docs" Icon="Book" />
+        <NavigationViewItem Content="Задачи" Tag="tasks" Icon="List" />
+        <NavigationViewItem Content="Файлы" Tag="files" Icon="Folder" />
+        <NavigationViewItem Content="Команда" Tag="team" Icon="People" />
+        <NavigationViewItem Content="Аккаунт" Tag="account" Icon="Contact" />
+      </NavigationView.MenuItems>
+      <ScrollViewer VerticalScrollBarVisibility="Auto">
+        <StackPanel x:Name="ContentPanel" Spacing="16" Padding="35,32,35,40"
+          MaxWidth="1100" HorizontalAlignment="Left"/>
+      </ScrollViewer>
+    </NavigationView>
+    <Grid x:Name="LoginRoot" Background="#08090B">
+      <Grid.ColumnDefinitions><ColumnDefinition Width="1.1*"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
+      <Border Grid.Column="0" Background="#202126" Margin="20" CornerRadius="28" Padding="48">
+        <StackPanel VerticalAlignment="Center" Spacing="19">
+          <TextBlock Text="N" FontSize="110" FontWeight="Black" Foreground="White" />
+          <TextBlock Text="NIGHTWELL / DEVELOPER SPACE" FontSize="12" CharacterSpacing="190" Foreground="#B8BCC4"/>
+          <TextBlock Text="Там, где создаются миры." FontSize="37" FontWeight="Bold" TextWrapping="WrapWholeWords"/>
+          <TextBlock Text="Идеи, история игры, задачи и материалы команды. Всё в одном защищённом пространстве."
+                     Foreground="#ABB0B9" FontSize="15" TextWrapping="WrapWholeWords"/>
+        </StackPanel>
+      </Border>
+      <StackPanel Grid.Column="1" Width="340" MaxWidth="400" HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="17">
+        <TextBlock Text="Закрытый доступ" FontSize="13" Foreground="#A7ABB4"/>
+        <TextBlock Text="С возвращением" FontSize="31" FontWeight="Bold"/>
+        <TextBox x:Name="UsernameInput" PlaceholderText="Логин" Height="47"/>
+        <PasswordBox x:Name="PasswordInput" PlaceholderText="Пароль" Height="47"/>
+        <Button x:Name="LoginButton" Content="Войти в пространство" Click="LoginClicked"
+          Background="White" Foreground="#101114" Height="48" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center"/>
+        <TextBlock x:Name="LoginError" Foreground="#FFB9AD" TextWrapping="WrapWholeWords"/>
+        <TextBlock Text="Регистрация отключена. Доступ выдаёт администратор." FontSize="12" Foreground="#9298A1" TextWrapping="Wrap"/>
+      </StackPanel>
+    </Grid>
+  </Grid>
+</Window>
