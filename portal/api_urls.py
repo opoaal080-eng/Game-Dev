@@ -1,7 +1,10 @@
 from django.urls import path
-from . import api
+from . import api, player_api
 
 urlpatterns = [
+    path("player-site/", player_api.player_site, name="native_player_site"),
+    path("player-site/news/", player_api.create_news, name="native_player_news_create"),
+    path("player-site/news/<int:pk>/", player_api.update_news, name="native_player_news_update"),
     path("auth/login/", api.login, name="native_login"),
     path("auth/logout/", api.logout, name="native_logout"),
     path("auth/password/", api.change_password, name="native_change_password"),
