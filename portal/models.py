@@ -150,3 +150,78 @@ class AppSession(models.Model):
 
     def __str__(self):
         return f"{self.user.username} · {self.device_name or 'Устройство'}"
+
+
+class GameInfo(models.Model):
+    """Creative bible of a game: one per project."""
+    project = models.OneToOneField(Project, on_delete=models.CASCADE, related_name="game_info")
+    genre = models.CharField("Жанр", max_length=240, blank=True)
+    title = models.CharField("Рабочее название игры", max_length=160, blank=True)
+    tagline = models.CharField("Короткое описание", max_length=300, blank=True)
+    setting = models.TextField("Мир и сеттинг", blank=True)
+    story = models.TextField("Сюжет", blank=True)
+    gameplay = models.TextField("Геймплей и механики", blank=True)
+    themes = models.TextField("Темы и атмосфера", blank=True)
+    universe = models.TextField("Лор и предыстория", blank=True)
+    platforms = models.CharField("Платформы", max_length=200, blank=True)
+    engine = models.CharField("Движок", max_length=100, blank=True)
+    development_status = models.CharField("Стадия разработки", max_length=120, blank=True)
+    audience = models.CharField("Аудитория и возрастной рейтинг", max_length=180, blank=True)
+    notes = models.TextField("Прочая информация", blank=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        verbose_name = "Информация об игре"
+        verbose_name_plural = "Информация об играх"
+
+    def __str__(self):
+        return f"Информация: {self.project.title}"
+
+
+class GameEvent(models.Model):
+    class Kind(models.TextChoices):
+        MAIN = "main", "Основное событие"
+        SIDE = "side", "Побочное событие"
+        BACKSTORY = "backstory", "Предыстория"
+        OPTIONAL = "optional", "Необязательное событие"
+
+    project = models.ForeignKey(Project, on_delete=models.CASCADE, related_name="game_events")
+    chapter = models.CharField("Глава или акт", max_length=120, blank=True)
+    title = models.CharField("Название события", max_length=180)
+    kind = models.CharField("Тип", max_length=16, choices=Kind.choices, default=Kind.MAIN)
+    order = models.PositiveIntegerField("Порядок событий", default=1)
+    timeline = models.CharField("Время в сюжете", max_length=120, blank=True)
+    location = models.CharField("Место действия", max_length=200, blank=True)
+    participants = models.CharField("Участники", max_length=300, blank=True)
+    summary = models.TextField("Краткое содержание", blank=True)
+    description = models.TextField("Подробное описание", blank=True)
+    consequences = models.TextField("Последствия и развилки", blank=True)
+    spoiler = models.BooleanField("Содержит спойлеры", default=False)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ["order", "pk"]
+        verbose_name = "Сюжетное событие"
+        verbose_name_plural = "Сюжетные события"
+
+    def __str__(self):
+        return self.title
+
+
+class GameCharacter(models.Model):
+    project = models.ForeignKey(Project, on_delete=models.CASCADE, related_name="game_characters")
+    name = models.CharField("Имя персонажа", max_length=160)
+    role = models.CharField("Роль в истории", max_length=160, blank=True)
+    faction = models.CharField("Фракция или организация", max_length=160, blank=True)
+    bio = models.TextField("Биография", blank=True)
+    motivation = models.TextField("Мотивация и цели", blank=True)
+    notes = models.TextField("Прочее", blank=True)
+    order = models.PositiveIntegerField("Порядок", default=1)
+
+    class Meta:
+        ordering = ["order", "pk"]
+        verbose_name = "Персонаж игры"
+        verbose_name_plural = "Персонажи игр"
+
+    def __str__(self):
+        return self.name
