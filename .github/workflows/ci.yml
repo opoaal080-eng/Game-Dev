@@ -85,3 +85,23 @@ jobs:
           assert 'news' in doc
           print('Public ASHFALL JSON verified')
           PY
+
+      - name: Verify GitHub Pages public ASHFALL site
+        run: |
+          set -e
+          site="https://opoaal080-eng.github.io/Game-Dev/ashfall/"
+          for i in $(seq 1 10); do
+            code=$(curl -sSL --max-time 20 -o /tmp/ashfall-gh.html -w "%{http_code}" "$site" || true)
+            echo "GitHub Pages attempt $i: HTTP $code"
+            if [ "$code" = 200 ] && grep -q 'id="hero-title"' /tmp/ashfall-gh.html; then
+              break
+            fi
+            sleep 5
+          done
+          test "$code" = 200
+          grep -q 'id="hero-title"' /tmp/ashfall-gh.html
+          css=$(curl -sSL --max-time 20 -o /dev/null -w "%{http_code}" "https://opoaal080-eng.github.io/Game-Dev/static/player/site.css")
+          data=$(curl -sSL --max-time 20 -o /dev/null -w "%{http_code}" "${site}data/public.json")
+          echo "CSS: HTTP $css, public data: HTTP $data"
+          test "$css" = 200
+          test "$data" = 200
