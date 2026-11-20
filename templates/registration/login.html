@@ -1,6 +1,6 @@
 {% load static %}
 <!doctype html>
-<html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex,nofollow,noarchive"><title>Вход · Nightwell Dev</title><link rel="icon" href="{% static 'img/favicon.svg' %}" type="image/svg+xml"><link rel="stylesheet" href="{% static 'css/app.css' %}"></head>
+<html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#08090b"><meta name="robots" content="noindex,nofollow,noarchive"><title>Вход · Nightwell Dev</title><link rel="icon" href="{% static 'img/favicon.svg' %}" type="image/svg+xml"><link rel="stylesheet" href="{% static 'css/app.css' %}"><link rel="stylesheet" href="{% static 'css/nightwell-ios.css' %}"></head>
 <body class="login-page">
   <div class="login-layout">
     <section class="login-intro">
@@ -13,6 +13,6 @@
       {% if next and user.is_authenticated %}<div class="error-box">У вас нет доступа к этой странице.</div>{% endif %}
       <form method="post" class="login-form">{% csrf_token %}<input type="hidden" name="next" value="{{ next }}"><label for="id_username">Логин</label><input id="id_username" name="username" type="text" autocomplete="username" required autofocus placeholder="Имя пользователя"><label for="id_password">Пароль</label><input id="id_password" name="password" type="password" autocomplete="current-password" required placeholder="Введите пароль"><button type="submit" class="btn btn-primary full">Войти в пространство <span>→</span></button></form>
       <div class="no-signup"><span class="small-lock">⌁</span> Регистрация отключена. Доступ выдаёт администратор.</div>
-    </div><div class="login-footer">dev.nightwell.fun <span>·</span> NIGHTWELL INTERNAL</div></section>
+    </div><div class="login-footer">NIGHTWELL DEV <span>·</span> PRIVATE WORKSPACE</div></section>
   </div>
 </body></html>
