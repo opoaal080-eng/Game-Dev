@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 from django.contrib.auth.models import User
-from .models import Asset, Post, Profile, Project, Task, GameInfo, GameEvent, GameCharacter, AppSession
+from .models import Asset, Post, Profile, Project, Task, GameInfo, GameEvent, GameCharacter, AppSession, PublicGamePage, PublicGameNews
 
 
 class ProfileInline(admin.StackedInline):
@@ -73,3 +73,17 @@ class AppSessionAdmin(admin.ModelAdmin):
     list_filter = ["user"]
     def has_add_permission(self, request):
         return False
+
+
+@admin.register(PublicGamePage)
+class PublicGamePageAdmin(admin.ModelAdmin):
+    list_display = ["title", "project", "is_published", "genre", "updated_at"]
+    list_filter = ["is_published"]
+    readonly_fields = ["updated_at"]
+
+
+@admin.register(PublicGameNews)
+class PublicGameNewsAdmin(admin.ModelAdmin):
+    list_display = ["title", "project", "is_published", "published_at"]
+    list_filter = ["is_published", "project"]
+    search_fields = ["title", "summary"]
