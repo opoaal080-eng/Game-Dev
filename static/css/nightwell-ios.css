@@ -433,3 +433,11 @@ a.result-entry:hover { background:#ffffff0c; }
 @media (prefers-reduced-motion:reduce) {
   *,*::before,*::after { animation-duration:.01ms !important; animation-iteration-count:1 !important; scroll-behavior:auto !important; transition-duration:.01ms !important; }
 }
+
+@media (max-width:760px) {
+  body.menu-is-open { overflow:hidden; }
+  .stat-card.is-pressing,.article-card.is-pressing,.member-card.is-pressing,.task-card.is-pressing { transform:scale(.986); }
+}
+@media (hover:hover) and (pointer:fine) {
+  .member-card:hover,.task-card:hover { border-color:#ffffff2a; background:#ffffff0f; }
+}
