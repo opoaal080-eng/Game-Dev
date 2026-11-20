@@ -22,6 +22,9 @@ if not SECRET_KEY or SECRET_KEY == "REPLACE_WITH_A_LONG_RANDOM_SECRET":
 ALLOWED_HOSTS = [host.strip() for host in os.getenv("DJANGO_ALLOWED_HOSTS", "localhost,127.0.0.1,dev.nightwell.fun").split(",") if host.strip()]
 CSRF_TRUSTED_ORIGINS = [origin.strip() for origin in os.getenv("DJANGO_CSRF_TRUSTED_ORIGINS", "https://dev.nightwell.fun").split(",") if origin.strip()]
 
+if "afl.nightwell.fun" not in ALLOWED_HOSTS:
+    ALLOWED_HOSTS.append("afl.nightwell.fun")
+
 # Railway assigns a temporary hostname until dev.nightwell.fun is connected.
 # Accept only the platform-provided hostname, never arbitrary request Host values.
 railway_hostname = os.getenv("RAILWAY_PUBLIC_DOMAIN", "").strip().lower()
@@ -41,6 +44,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
+    "portal.public_site.AshfallCustomDomainMiddleware",
     "portal.middleware.NativePagesCORSMiddleware",
     "whitenoise.middleware.WhiteNoiseMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
