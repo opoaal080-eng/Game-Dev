@@ -3,6 +3,7 @@ on:
   push:
     paths:
       - "bootstrap/go.txt"
+      - ".github/workflows/import.yml"
   workflow_dispatch:
 
 permissions:
@@ -28,6 +29,8 @@ jobs:
           echo "2f010a3739b47f8887f51df698254c6bf134c57a8b27df31817e28d8094291dd  /tmp/nightwell-dev.tar.xz" | sha256sum --check
           tar -xJf /tmp/nightwell-dev.tar.xz -C .
           git rm -r -f bootstrap
+          # Workflow files must be added with an authorized GitHub app, not GITHUB_TOKEN
+          rm -f .github/workflows/ci.yml
           git add -A
           git config user.name "nightwell-dev-bot"
           git config user.email "github-actions[bot]@users.noreply.github.com"
