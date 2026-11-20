@@ -225,3 +225,53 @@ class GameCharacter(models.Model):
 
     def __str__(self):
         return self.name
+
+
+class PublicGamePage(models.Model):
+    """Curated information for players, never a public mirror of private GameInfo."""
+    project = models.OneToOneField(Project, on_delete=models.CASCADE, related_name="public_page")
+    is_published = models.BooleanField("Сайт опубликован", default=False)
+    title = models.CharField("Название игры", max_length=160, default="ASHFALL")
+    eyebrow = models.CharField("Надпись над названием", max_length=120, blank=True)
+    tagline = models.CharField("Слоган", max_length=240, blank=True)
+    introduction = models.TextField("Описание для игроков", blank=True)
+    story_teaser = models.TextField("Завязка сюжета без спойлеров", blank=True)
+    world_description = models.TextField("Мир игры для игроков", blank=True)
+    feature_lines = models.TextField("Особенности, одна на строку", blank=True)
+    genre = models.CharField("Жанр", max_length=200, blank=True)
+    platforms = models.CharField("Платформы", max_length=180, blank=True)
+    development_status = models.CharField("Этап разработки", max_length=120, blank=True)
+    release_window = models.CharField("Дата или период релиза", max_length=120, blank=True)
+    hero_image_url = models.URLField("Главное изображение, HTTPS", max_length=600, blank=True)
+    trailer_url = models.URLField("Трейлер или видео, HTTPS", max_length=600, blank=True)
+    screenshots = models.TextField("Скриншоты, HTTPS-ссылки по одной в строке", blank=True)
+    community_url = models.URLField("Сообщество, HTTPS", max_length=600, blank=True)
+    telegram_url = models.URLField("Telegram, HTTPS", max_length=600, blank=True)
+    wishlist_url = models.URLField("Страница игры в магазине, HTTPS", max_length=600, blank=True)
+    contact_email = models.EmailField("Email для связи", blank=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        verbose_name = "Публичный сайт игры"
+        verbose_name_plural = "Публичные сайты игр"
+
+    def __str__(self):
+        return f"{self.title} · {'опубликовано' if self.is_published else 'черновик'}"
+
+
+class PublicGameNews(models.Model):
+    project = models.ForeignKey(Project, on_delete=models.CASCADE, related_name="public_news")
+    title = models.CharField("Заголовок новости", max_length=180)
+    summary = models.CharField("Краткое описание", max_length=320, blank=True)
+    content = models.TextField("Текст для игроков", blank=True)
+    is_published = models.BooleanField("Показать игрокам", default=False)
+    published_at = models.DateTimeField("Дата публикации", default=timezone.now)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ["-published_at", "-id"]
+        verbose_name = "Публичная новость"
+        verbose_name_plural = "Публичные новости"
+
+    def __str__(self):
+        return self.title
