@@ -8,8 +8,8 @@ from django.views.decorators.cache import never_cache
 from django.views.decorators.http import require_GET, require_http_methods, require_POST
 
 from .access import can_write, is_admin, require_owner_or_admin, require_writer
-from .forms import AssetForm, PostForm, TaskForm, GameInfoForm, GameEventForm, GameCharacterForm
-from .models import Asset, Post, Project, Task, GameInfo, GameEvent, GameCharacter
+from .forms import AssetForm, PostForm, TaskForm, GameInfoForm, GameEventForm, GameCharacterForm, PublicGamePageForm, PublicGameNewsForm
+from .models import Asset, Post, Project, Task, GameInfo, GameEvent, GameCharacter, PublicGamePage, PublicGameNews
 
 
 def visible_posts(user):
@@ -308,3 +308,54 @@ def character_edit(request, pk):
         messages.success(request, "Персонаж обновлён")
         return redirect(f"/information/?project={character.project_id}#characters")
     return render(request, "portal/editor.html", {"title": f"Персонаж · {character.name}", "form": form})
+
+
+@login_required
+@require_http_methods(["GET", "POST"])
+def player_site_editor(request):
+    """Public content stays separate from the private creative bible."""
+    require_writer(request.user)
+    project = get_object_or_404(Project, slug="main")
+    page, _ = PublicGamePage.objects.get_or_create(project=project, defaults={"title": "ASHFALL"})
+    form = PublicGamePageForm(request.POST or None, instance=page)
+    if request.method == "POST" and form.is_valid():
+        form.save()
+        messages.success(request, "Публичный сайт ASHFALL обновлён. Обновление на GitHub Pages появится после синхронизации.")
+        return redirect("player_site_editor")
+    return render(request, "portal/player_site_editor.html", {
+        "form": form,
+        "page": page,
+        "news": PublicGameNews.objects.filter(project=project).order_by("-published_at")[:40],
+    })
+
+
+@login_required
+@require_http_methods(["GET", "POST"])
+def player_news_create(request):
+    require_writer(request.user)
+    project = get_object_or_404(Project, slug="main")
+    form = PublicGameNewsForm(request.POST or None)
+    if request.method == "POST" and form.is_valid():
+        news = form.save(commit=False)
+        news.project = project
+        news.save()
+        messages.success(request, "Публичная новость сохранена.")
+        return redirect("player_site_editor")
+    return render(request, "portal/editor.html", {
+        "form": form, "title": "Новость для игроков", "section": "public",
+    })
+
+
+@login_required
+@require_http_methods(["GET", "POST"])
+def player_news_edit(request, pk):
+    require_writer(request.user)
+    news = get_object_or_404(PublicGameNews, pk=pk, project__slug="main")
+    form = PublicGameNewsForm(request.POST or None, instance=news)
+    if request.method == "POST" and form.is_valid():
+        form.save()
+        messages.success(request, "Новость для игроков обновлена.")
+        return redirect("player_site_editor")
+    return render(request, "portal/editor.html", {
+        "form": form, "title": "Редактировать публичную новость", "section": "public",
+    })
