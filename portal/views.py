@@ -8,8 +8,8 @@ from django.views.decorators.cache import never_cache
 from django.views.decorators.http import require_GET, require_http_methods, require_POST
 
 from .access import can_write, is_admin, require_owner_or_admin, require_writer
-from .forms import AssetForm, PostForm, TaskForm
-from .models import Asset, Post, Project, Task
+from .forms import AssetForm, PostForm, TaskForm, GameInfoForm, GameEventForm, GameCharacterForm
+from .models import Asset, Post, Project, Task, GameInfo, GameEvent, GameCharacter
 
 
 def visible_posts(user):
@@ -221,3 +221,90 @@ def search(request):
         tasks = Task.objects.select_related("project").filter(Q(title__icontains=term) | Q(description__icontains=term))[:30]
         assets = Asset.objects.select_related("project").filter(Q(title__icontains=term) | Q(description__icontains=term))[:30]
     return render(request, "portal/search.html", {"term": term, "posts": posts, "tasks": tasks, "assets": assets})
+
+
+@login_required
+@require_GET
+def information(request):
+    projects = Project.objects.all().order_by("title")
+    selected_id = request.GET.get("project", "")
+    project = projects.filter(pk=int(selected_id)).first() if selected_id.isdigit() else projects.first()
+    if not project:
+        raise Http404("Проекты не найдены")
+    info = GameInfo.objects.filter(project=project).first()
+    events = GameEvent.objects.filter(project=project).order_by("order", "pk")
+    characters = GameCharacter.objects.filter(project=project).order_by("order", "pk")
+    return render(request, "portal/information.html", {
+        "projects": projects, "project": project, "info": info,
+        "events": events, "characters": characters,
+    })
+
+
+@login_required
+@require_http_methods(["GET", "POST"])
+def information_edit(request, pk):
+    require_writer(request.user)
+    project = get_object_or_404(Project, pk=pk)
+    info, _ = GameInfo.objects.get_or_create(project=project)
+    form = GameInfoForm(request.POST or None, instance=info)
+    if request.method == "POST" and form.is_valid():
+        form.save()
+        messages.success(request, "Информация об игре обновлена")
+        return redirect(f"/information/?project={project.pk}")
+    return render(request, "portal/editor.html", {"title": f"Информация · {project.title}", "form": form})
+
+
+@login_required
+@require_http_methods(["GET", "POST"])
+def event_create(request, pk):
+    require_writer(request.user)
+    project = get_object_or_404(Project, pk=pk)
+    form = GameEventForm(request.POST or None)
+    if request.method == "POST" and form.is_valid():
+        item = form.save(commit=False)
+        item.project = project
+        item.save()
+        messages.success(request, "Событие добавлено в хронологию")
+        return redirect(f"/information/?project={project.pk}#events")
+    return render(request, "portal/editor.html", {"title": f"Новое событие · {project.title}", "form": form})
+
+
+@login_required
+@require_http_methods(["GET", "POST"])
+def event_edit(request, pk):
+    require_writer(request.user)
+    event = get_object_or_404(GameEvent, pk=pk)
+    form = GameEventForm(request.POST or None, instance=event)
+    if request.method == "POST" and form.is_valid():
+        form.save()
+        messages.success(request, "Событие обновлено")
+        return redirect(f"/information/?project={event.project_id}#events")
+    return render(request, "portal/editor.html", {"title": f"Событие · {event.title}", "form": form})
+
+
+@login_required
+@require_http_methods(["GET", "POST"])
+def character_create(request, pk):
+    require_writer(request.user)
+    project = get_object_or_404(Project, pk=pk)
+    form = GameCharacterForm(request.POST or None)
+    if request.method == "POST" and form.is_valid():
+        character = form.save(commit=False)
+        character.project = project
+        character.save()
+        messages.success(request, "Персонаж добавлен")
+        return redirect(f"/information/?project={project.pk}#characters")
+    return render(request, "portal/editor.html", {"title": f"Новый персонаж · {project.title}", "form": form})
+
+
+@login_required
+@require_http_methods(["GET", "POST"])
+def character_edit(request, pk):
+    require_writer(request.user)
+    character = get_object_or_404(GameCharacter, pk=pk)
+    form = GameCharacterForm(request.POST or None, instance=character)
+    if request.method == "POST" and form.is_valid():
+        form.save()
+        messages.success(request, "Персонаж обновлён")
+        return redirect(f"/information/?project={character.project_id}#characters")
+    return render(request, "portal/editor.html", {"title": f"Персонаж · {character.name}", "form": form})
