@@ -15,5 +15,11 @@ urlpatterns = [
     path("files/new/", views.asset_create, name="asset_create"),
     path("files/<int:pk>/download/", views.asset_download, name="asset_download"),
     path("team/", views.team, name="team"),
+    path("information/", views.information, name="information"),
+    path("information/<int:pk>/edit/", views.information_edit, name="information_edit"),
+    path("information/<int:pk>/events/new/", views.event_create, name="event_create"),
+    path("information/events/<int:pk>/edit/", views.event_edit, name="event_edit"),
+    path("information/<int:pk>/characters/new/", views.character_create, name="character_create"),
+    path("information/characters/<int:pk>/edit/", views.character_edit, name="character_edit"),
     path("search/", views.search, name="search"),
 ]
