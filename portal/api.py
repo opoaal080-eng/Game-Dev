@@ -69,7 +69,8 @@ def require_token(view):
 def user_json(user):
     return {"id": user.pk, "username": user.username,
             "name": user.get_full_name() or user.username,
-            "role": role_of(user), "can_write": can_write(user)}
+            "role": role_of(user), "can_write": can_write(user),
+            "job_title": getattr(getattr(user, "dev_profile", None), "job_title", "")}
 
 
 def project_json(project):
