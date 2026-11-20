@@ -40,3 +40,15 @@ jobs:
           done
           echo "Login endpoint did not return HTTP 200" >&2
           exit 1
+
+      - name: Verify Game Bible and native API require authentication
+        run: |
+          set -e
+          base="https://nightwell-dev-web-production.up.railway.app"
+          api=$(curl -sS --max-time 20 -o /tmp/native-api-response.json -w "%{http_code}" "$base/api/v1/me/")
+          echo "Unauthenticated API status: $api"
+          test "$api" = "401"
+          grep -q 'error' /tmp/native-api-response.json
+          website=$(curl -sS --max-time 20 -o /dev/null -w "%{http_code}" "$base/information/")
+          echo "Unauthenticated game information status: $website"
+          test "$website" = "302"
