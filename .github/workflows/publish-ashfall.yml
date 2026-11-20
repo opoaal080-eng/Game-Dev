@@ -44,7 +44,7 @@ jobs:
                   raise SystemExit(f"Unexpected source status: {response.status}")
               raw = response.read(256 * 1024)
           data = json.loads(raw)
-          if data.get("schema") != 1 or type(data.get("published")) is not bool or data.get("title") != "ASHFALL":
+          if data.get("schema") != 1 or type(data.get("published")) is not bool or not isinstance(data.get("title"), str) or not data["title"].strip():
               raise SystemExit("Refusing unexpected or unapproved JSON source")
           path = Path("ashfall/data/public.json")
           path.parent.mkdir(parents=True, exist_ok=True)
