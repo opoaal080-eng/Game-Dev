@@ -1,12 +1,16 @@
 from django.contrib import admin
 from django.contrib.auth import views as auth_views
 from django.urls import include, path, reverse_lazy
+from portal import public_site
 
 admin.site.site_header = "Nightwell Dev · Управление"
 admin.site.site_title = "Nightwell Dev"
 admin.site.index_title = "Администрирование"
 
 urlpatterns = [
+    path("api/public/ashfall/", public_site.public_data, name="public_ashfall_data"),
+    path("ashfall/", public_site.public_shell, name="public_ashfall_site"),
+    path("ashfall/data/public.json", public_site.public_data, name="public_ashfall_snapshot"),
     path("api/v1/", include("portal.api_urls")),
     path("control/", admin.site.urls),
     path("login/", auth_views.LoginView.as_view(template_name="registration/login.html", redirect_authenticated_user=True), name="login"),
