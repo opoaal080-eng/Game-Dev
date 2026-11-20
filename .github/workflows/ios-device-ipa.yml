@@ -1,0 +1,62 @@
+name: Nightwell Dev iPhone IPA
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - "clients/ios/**"
+      - ".github/workflows/ios-device-ipa.yml"
+
+permissions:
+  contents: write
+
+jobs:
+  iphone-ipa:
+    name: Build unsigned iPhone IPA
+    runs-on: macos-26
+    steps:
+      - uses: actions/checkout@v4
+      - name: Generate Xcode project
+        run: |
+          brew install xcodegen
+          cd clients/ios
+          xcodegen generate
+      - name: Compile for physical iPhone
+        run: |
+          xcodebuild -project clients/ios/NightwellDev.xcodeproj \
+            -scheme NightwellDev \
+            -configuration Release \
+            -sdk iphoneos \
+            -destination 'generic/platform=iOS' \
+            -derivedDataPath "$RUNNER_TEMP/iphone-build" \
+            CODE_SIGNING_ALLOWED=NO \
+            build
+      - name: Create IPA with Payload directory
+        run: |
+          set -euo pipefail
+          APP="$RUNNER_TEMP/iphone-build/Build/Products/Release-iphoneos/NightwellDev.app"
+          test -d "$APP"
+          mkdir -p "$RUNNER_TEMP/iphone-package/Payload"
+          cp -R "$APP" "$RUNNER_TEMP/iphone-package/Payload/"
+          cd "$RUNNER_TEMP/iphone-package"
+          zip -q -r "$RUNNER_TEMP/NightwellDev-iPhone-unsigned.ipa" Payload
+          unzip -l "$RUNNER_TEMP/NightwellDev-iPhone-unsigned.ipa" | grep -q 'Payload/NightwellDev.app/'
+      - name: Upload IPA as GitHub Actions artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: NightwellDev-iPhone-unsigned-IPA
+          path: ${{ runner.temp }}/NightwellDev-iPhone-unsigned.ipa
+          if-no-files-found: error
+      - name: Publish downloadable IPA as prerelease
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "nightwell-dev-ios-unsigned-v0.1" \
+            "$RUNNER_TEMP/NightwellDev-iPhone-unsigned.ipa#NightwellDev-iPhone-unsigned.ipa" \
+            --title "Nightwell Dev for iPhone (unsigned IPA)" \
+            --notes "Native SwiftUI app compiled for physical iPhone. Unsigned build: sign with your own sideloading certificate before installation. Not an App Store or Apple Developer signed release." \
+            --prerelease \
+            --target "${{ github.sha }}" \
+            || gh release upload "nightwell-dev-ios-unsigned-v0.1" \
+              "$RUNNER_TEMP/NightwellDev-iPhone-unsigned.ipa#NightwellDev-iPhone-unsigned.ipa" --clobber
