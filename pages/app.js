@@ -2,13 +2,13 @@
 "use strict";
 (() => {
   const API = "https://nightwell-dev-web-production.up.railway.app/api/v1/";
-  const LABELS = {home:"Главная",info:"Информация",journal:"Дневник",docs:"Документация",tasks:"Задачи",files:"Файлы",team:"Команда"};
+  const LABELS = {home:"Главная",info:"Информация",journal:"Дневник",docs:"Документация",tasks:"Задачи",files:"Файлы",team:"Команда",player:"Сайт ASHFALL"};
   const STATUSES = {todo:"К выполнению",progress:"В работе",review:"На проверке",done:"Готово"};
   const PRIORITIES = {low:"Низкий",normal:"Обычный",high:"Высокий",critical:"Критический"};
   const KINDS = {devlog:"Дневник",doc:"Документация",note:"Заметка",meeting:"Встреча",decision:"Решение"};
   const state = { token:sessionStorage.getItem("nwdev_token")||"",
     user:null,projects:[],currentProject:0,posts:[],tasks:[],files:[],team:[],home:null,
-    info:null,events:[],characters:[],view:"home",query:"" };
+    info:null,events:[],characters:[],playerSite:null,playerLoading:false,playerError:"",view:"home",query:"" };
   const $ = (id) => document.getElementById(id);
   const node = (tag,cls,text) => {
     const item=document.createElement(tag);
@@ -82,6 +82,7 @@
     $("top-avatar").textContent=(state.user?.username||"N").slice(0,1).toUpperCase();
     $("sidebar-username").textContent=state.user?.name||state.user?.username||"Разработчик";
     $("sidebar-role").textContent={admin:"Администратор",developer:"Разработчик",viewer:"Наблюдатель"}[state.user?.role]||"Участник";
+    document.querySelectorAll("[data-writer-only]").forEach(x=>{x.hidden=!canEdit()});
     const picker=$("project-picker");picker.replaceChildren();
     state.projects.forEach(p=>{const opt=node("option","",p.name);opt.value=String(p.id);picker.add(opt)});
     picker.value=String(state.currentProject);
@@ -142,7 +143,7 @@
     const c=$("content");c.replaceChildren();
     const page=state.view in LABELS?state.view:"home";
     ({home:renderHome,info:renderInfo,journal:()=>renderPosts(false),docs:()=>renderPosts(true),
-      tasks:renderTasks,files:renderFiles,team:renderTeam})[page](c);
+      tasks:renderTasks,files:renderFiles,team:renderTeam,player:renderPlayer})[page](c);
   }
   function renderHome(c){
     add(c,buildHead("NIGHTWELL / РАБОЧЕЕ ПРОСТРАНСТВО","Твоя команда.","Здесь собираются идеи, события и задачи команды Nightwell."));
@@ -269,6 +270,96 @@
       grid.append(b);
     });c.append(grid);
   }
+
+  function renderPlayer(c) {
+    if (!canEdit()) {
+      add(c,buildHead("ASHFALL","Доступ ограничен.","Редактирование публичного сайта доступно разработчикам."));
+      return;
+    }
+    add(c,buildHead("ASHFALL / ПУБЛИКАЦИЯ ДЛЯ ИГРОКОВ","Сайт ASHFALL.",
+      "Меняй контент, новости и ссылки публичного сайта. Закрытая информация Nightwell Dev не раскрывается.",
+      [action("Редактировать сайт",editPlayerPage,"primary")]));
+    const intro=box(title("Публичный сайт игры","h2"),
+      sub("Открытый сайт: https://opoaal080-eng.github.io/Game-Dev/ashfall/"),
+      sub("Обновления синхронизируются автоматически с публичной страницей GitHub Pages."),
+      action("Открыть сайт ↗",()=>window.open("https://opoaal080-eng.github.io/Game-Dev/ashfall/","_blank","noopener,noreferrer")));
+    c.append(intro);
+    if(!state.playerSite) {
+      c.append(node("div","empty",state.playerError||"Загружаем настройки публикации..."));
+      if(!state.playerLoading&&!state.playerError) {
+        state.playerLoading=true;
+        api("player-site/").then(data=>{
+          state.playerSite=data;
+          if(state.view==="player")render();
+        }).catch(e=>{
+          state.playerError=errorText(e);
+          if(state.view==="player")render();
+        }).finally(()=>state.playerLoading=false);
+      }
+      return;
+    }
+    const site=state.playerSite.page||{};
+    const status=node("span","pill",site.is_published?"ОПУБЛИКОВАНО":"ЧЕРНОВИК");
+    add(c,box(line("РЕЖИМ ПУБЛИКАЦИИ"),status,
+      title(site.title||"ASHFALL","h2"),sub(site.tagline||"Слоган игры пока не заполнен."),
+      sub("Жанр: "+(site.genre||"не указан")+" · Платформы: "+(site.platforms||"не объявлены")),
+      action("Изменить описание и ссылки",editPlayerPage)));
+    const section=node("div","section-head");
+    add(section,title("Новости для игроков","h2"),action("＋ Создать новость",()=>editPlayerNews(null),"primary"));c.append(section);
+    const news=state.playerSite.news||[],cards=node("div","stack");
+    if(!news.length)cards.append(node("div","empty","Публичных новостей ещё нет"));
+    news.forEach(item=>{
+      const card=box(line((item.is_published?"ОПУБЛИКОВАНО":"ЧЕРНОВИК")+" · "+(item.date||"")),
+        title(item.title,"h3"),sub(item.summary||item.content||""),action("Изменить",()=>editPlayerNews(item)));
+      cards.append(card);
+    });
+    c.append(cards);
+  }
+
+  function editPlayerPage() {
+    const p=state.playerSite?.page;
+    if(!p) {toast("Настройки ещё загружаются");return}
+    const fields=[
+      field("is_published","Публиковать сайт для игроков",p.is_published,"checkbox"),
+      field("title","Название игры",p.title||"ASHFALL","text",{required:true}),
+      field("eyebrow","Надпись над названием",p.eyebrow),
+      field("tagline","Слоган",p.tagline),
+      field("introduction","Описание для игроков",p.introduction,"textarea"),
+      field("story_teaser","Завязка истории без спойлеров",p.story_teaser,"textarea"),
+      field("world_description","Мир игры (публично)",p.world_description,"textarea"),
+      field("feature_lines","Особенности (по одной на строку)",p.feature_lines,"textarea"),
+      field("genre","Жанр",p.genre),
+      field("platforms","Платформы",p.platforms),
+      field("development_status","Стадия разработки",p.development_status),
+      field("release_window","Дата или период релиза",p.release_window),
+      field("hero_image_url","Ссылка на обложку, HTTPS",p.hero_image_url),
+      field("trailer_url","Ссылка на видео, HTTPS",p.trailer_url),
+      field("screenshots","Скриншоты (HTTPS, по одной ссылке в строке)",p.screenshots,"textarea"),
+      field("wishlist_url","Ссылка на страницу игры",p.wishlist_url),
+      field("community_url","Ссылка на сообщество",p.community_url),
+      field("telegram_url","Ссылка на Telegram",p.telegram_url),
+      field("contact_email","Email для связи",p.contact_email)
+    ];
+    editModal("Публичный сайт ASHFALL",fields,async data=>{
+      await api("player-site/",{method:"PUT",data});
+      state.playerSite=null;state.playerError="";
+    });
+  }
+
+  function editPlayerNews(item) {
+    const p=item||{};
+    editModal(item?"Изменить новость":"Новая новость для игроков",[
+      field("title","Заголовок",p.title,"text",{required:true}),
+      field("summary","Краткое описание",p.summary),
+      field("content","Полный текст",p.content,"textarea"),
+      field("is_published","Показывать игрокам",p.is_published||false,"checkbox")
+    ],async data=>{
+      if(item)await api("player-site/news/"+item.id+"/",{method:"PATCH",data});
+      else await api("player-site/news/",{method:"POST",data});
+      state.playerSite=null;state.playerError="";
+    });
+  }
+
   function closeModal(){
     $("modal-backdrop").hidden=true;$("modal-form").onsubmit=null;
     $("modal-fields").replaceChildren();$("modal-error").hidden=true;
