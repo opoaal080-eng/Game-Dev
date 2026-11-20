@@ -2,8 +2,7 @@ name: Import Nightwell Dev source
 on:
   push:
     paths:
-      - "bootstrap/nightwell-dev.tar.xz.b64"
-      - ".github/workflows/import.yml"
+      - "bootstrap/go.txt"
   workflow_dispatch:
 
 permissions:
@@ -19,14 +18,16 @@ jobs:
       - name: Expand and publish source
         shell: bash
         run: |
-          if [ ! -f bootstrap/nightwell-dev.tar.xz.b64 ]; then
-            echo "No source payload yet"
+          if [ ! -f bootstrap/go.txt ]; then
+            echo "Import already completed"
             exit 0
           fi
-          base64 --decode bootstrap/nightwell-dev.tar.xz.b64 > /tmp/nightwell-dev.tar.xz
+          test "$(find bootstrap -name 'part-*' -type f | wc -l)" -eq 6
+          cat bootstrap/part-* > /tmp/nightwell-dev.base64
+          base64 --decode /tmp/nightwell-dev.base64 > /tmp/nightwell-dev.tar.xz
           echo "2f010a3739b47f8887f51df698254c6bf134c57a8b27df31817e28d8094291dd  /tmp/nightwell-dev.tar.xz" | sha256sum --check
           tar -xJf /tmp/nightwell-dev.tar.xz -C .
-          git rm -f bootstrap/nightwell-dev.tar.xz.b64
+          git rm -r -f bootstrap
           git add -A
           git config user.name "nightwell-dev-bot"
           git config user.email "github-actions[bot]@users.noreply.github.com"
