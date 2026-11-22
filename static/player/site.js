@@ -4,7 +4,7 @@
   const $ = (id) => document.getElementById(id);
   const API = "https://nightwell-dev-web-production.up.railway.app/api/public/ashfall/";
   const DEFAULT = {
-    title:"ASHFALL",eyebrow:"NIGHTWELL · ИГРОВОЙ ПРОЕКТ",
+    title:"ASHFALL",eyebrow:"NIGHTWELL STUDIO · ИГРОВОЙ ПРОЕКТ",
     tagline:"Официальный сайт проекта",published:false,
     introduction:"Подробности игрового проекта ASHFALL появятся здесь по мере публикации командой разработчиков.",
     story_teaser:"",world_description:"",feature_lines:[],genre:"",platforms:"",
@@ -46,7 +46,7 @@
     const page = data.published === true ? {...DEFAULT,...data} : DEFAULT;
     current = page;
     const set = (id,value) => { if ($(id)) $(id).textContent=value; };
-    set("eyebrow",plain(page.eyebrow,"NIGHTWELL · ИГРОВОЙ ПРОЕКТ"));
+    set("eyebrow",plain(page.eyebrow,"NIGHTWELL STUDIO · ИГРОВОЙ ПРОЕКТ"));
     set("hero-title",plain(page.title,"ASHFALL").toUpperCase());
     // Retain brand typography and colored dot independently of dynamic title.
     const dot=elem("span","hero-period",".");
