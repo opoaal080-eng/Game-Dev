@@ -85,7 +85,7 @@ struct LoginScreen: View {
                         Text("N").font(.system(size: 27, weight: .black, design: .rounded))
                             .foregroundStyle(.black).frame(width: 46, height: 46).background(.white, in: RoundedRectangle(cornerRadius: 15))
                         VStack(alignment: .leading, spacing: 2) {
-                            Text("NIGHTWELL").font(.system(size: 16, weight: .heavy)).tracking(2)
+                            Text("NIGHTWELL STUDIO").font(.system(size: 13, weight: .heavy)).tracking(1.2)
                             Text("DEVELOPER SPACE").font(.system(size: 9, weight: .medium)).tracking(1.8).foregroundStyle(Palette.muted)
                         }
                     }
@@ -149,7 +149,7 @@ struct OverviewScreen: View {
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 18) {
-                HeaderLabel(title: "Твоя команда.", caption: "NIGHTWELL / РАБОЧЕЕ ПРОСТРАНСТВО")
+                HeaderLabel(title: "Твоя команда.", caption: "NIGHTWELL STUDIO / РАБОЧЕЕ ПРОСТРАНСТВО")
                 GlassCard {
                     VStack(alignment: .leading, spacing: 16) {
                         Text("СОЗДАВАЙТЕ МИРЫ ВМЕСТЕ").font(.caption2.bold()).tracking(1.5).foregroundStyle(Palette.muted)
@@ -608,7 +608,7 @@ struct MoreScreen: View {
                 NavigationLink { PasswordScreen() } label: { Label("Сменить пароль", systemImage: "lock.rotation") }
                 Button(role: .destructive) { Task { await store.logout() } } label: { Label("Выйти", systemImage: "rectangle.portrait.and.arrow.right") }
             }
-            Section { Text("Nightwell Dev · Native SwiftUI").font(.footnote).foregroundStyle(Palette.muted) }
+            Section { Text("Nightwell Studio · Nightwell Dev").font(.footnote).foregroundStyle(Palette.muted) }
         }.navigationTitle("Ещё").scrollContentBackground(.hidden).background(Palette.background)
     }
 }
