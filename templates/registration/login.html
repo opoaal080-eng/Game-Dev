@@ -4,7 +4,7 @@
 <body class="login-page">
   <div class="login-layout">
     <section class="login-intro">
-      <a href="{% url 'login' %}" class="login-brand"><span class="brand-mark">N</span> NIGHTWELL <span class="muted-word">DEV</span></a>
+      <a href="{% url 'login' %}" class="login-brand"><span class="brand-mark">N</span> NIGHTWELL STUDIO <span class="muted-word">DEV</span></a>
       <div class="login-visual"><div class="signal signal-one"></div><div class="signal signal-two"></div><div class="giant-n">N</div></div>
       <div class="intro-bottom"><div class="eyebrow"><span class="online-dot"></span> SECURE DEVELOPMENT SPACE</div><h1>Там, где<br>создаются миры<span class="accent">.</span></h1><p>Идеи, заметки, задачи и материалы команды в одном закрытом пространстве.</p></div>
     </section>
@@ -13,6 +13,6 @@
       {% if next and user.is_authenticated %}<div class="error-box">У вас нет доступа к этой странице.</div>{% endif %}
       <form method="post" class="login-form">{% csrf_token %}<input type="hidden" name="next" value="{{ next }}"><label for="id_username">Логин</label><input id="id_username" name="username" type="text" autocomplete="username" required autofocus placeholder="Имя пользователя"><label for="id_password">Пароль</label><input id="id_password" name="password" type="password" autocomplete="current-password" required placeholder="Введите пароль"><button type="submit" class="btn btn-primary full">Войти в пространство <span>→</span></button></form>
       <div class="no-signup"><span class="small-lock">⌁</span> Регистрация отключена. Доступ выдаёт администратор.</div>
-    </div><div class="login-footer">NIGHTWELL DEV <span>·</span> PRIVATE WORKSPACE</div></section>
+    </div><div class="login-footer">NIGHTWELL STUDIO DEV <span>·</span> PRIVATE WORKSPACE</div></section>
   </div>
 </body></html>
