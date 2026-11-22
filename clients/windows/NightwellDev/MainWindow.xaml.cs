@@ -23,7 +23,7 @@ public sealed partial class MainWindow : Window
     public MainWindow()
     {
         InitializeComponent();
-        Title = "Nightwell Dev";
+        Title = "Nightwell Dev · Nightwell Studio";
         LoginRoot.Loaded += async (_, _) =>
         {
             if (!api.SignedIn) return;
@@ -145,7 +145,7 @@ public sealed partial class MainWindow : Window
 
     private void RenderHome()
     {
-        Header("Твоя команда.", "NIGHTWELL / РАБОЧЕЕ ПРОСТРАНСТВО");
+        Header("Твоя команда.", "NIGHTWELL STUDIO / РАБОЧЕЕ ПРОСТРАНСТВО");
         ContentPanel.Children.Add(Card(
             Text("СОЗДАВАЙТЕ МИРЫ ВМЕСТЕ", 11, true, true),
             Text("Все идеи. Одна история.", 30, true),
@@ -433,7 +433,7 @@ public sealed partial class MainWindow : Window
 
     private void RenderAccount()
     {
-        Header("Аккаунт.", "NIGHTWELL / БЕЗОПАСНОСТЬ");
+        Header("Аккаунт.", "NIGHTWELL STUDIO / БЕЗОПАСНОСТЬ");
         ContentPanel.Children.Add(Card(
             Text("Пользователь: " + api.Username, 18, true),
             Text("Роль: " + api.Role, 13, false, true),
