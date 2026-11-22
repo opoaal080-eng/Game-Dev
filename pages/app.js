@@ -280,9 +280,10 @@
       "Меняй контент, новости и ссылки публичного сайта. Закрытая информация Nightwell Dev не раскрывается.",
       [action("Редактировать сайт",editPlayerPage,"primary")]));
     const intro=box(title("Публичный сайт игры","h2"),
-      sub("Открытый сайт: https://opoaal080-eng.github.io/Game-Dev/ashfall/"),
-      sub("Обновления синхронизируются автоматически с публичной страницей GitHub Pages."),
-      action("Открыть сайт ↗",()=>window.open("https://opoaal080-eng.github.io/Game-Dev/ashfall/","_blank","noopener,noreferrer")));
+      sub("Основной адрес: https://afl.nightwell.fun/"),
+      sub("Резервная публикация: GitHub Pages, обновляется по расписанию."),
+      action("Открыть afl.nightwell.fun ↗",()=>window.open("https://afl.nightwell.fun/","_blank","noopener,noreferrer")),
+      action("Открыть GitHub Pages ↗",()=>window.open("https://opoaal080-eng.github.io/Game-Dev/ashfall/","_blank","noopener,noreferrer")));
     c.append(intro);
     if(!state.playerSite) {
       c.append(node("div","empty",state.playerError||"Загружаем настройки публикации..."));

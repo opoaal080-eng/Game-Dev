@@ -117,6 +117,52 @@ class AshfallPublicSiteTests(TestCase):
             "Новый слоган",
         )
 
+    def test_native_news_draft_then_publish_changes_player_feed(self):
+        token = self._login_token(self.developer)
+        auth = {"HTTP_AUTHORIZATION": "Bearer " + token}
+        create = self.client.post(
+            reverse("native_player_news_create"),
+            data=json.dumps({
+                "title": "Анонс с телефона",
+                "summary": "Новость для игроков",
+                "content": "Новый материал",
+                "is_published": False,
+            }),
+            content_type="application/json",
+            **auth,
+        )
+        self.assertEqual(create.status_code, 201, create.content)
+        news_id = create.json()["item"]["id"]
+        public = self.client.get(reverse("public_ashfall_data")).json()
+        self.assertNotIn("Анонс с телефона", json.dumps(public, ensure_ascii=False))
+
+        publish = self.client.patch(
+            reverse("native_player_news_update", kwargs={"pk": news_id}),
+            data=json.dumps({"is_published": True}),
+            content_type="application/json",
+            **auth,
+        )
+        self.assertEqual(publish.status_code, 200, publish.content)
+        public = self.client.get(reverse("public_ashfall_data")).json()
+        self.assertIn("Анонс с телефона", [news["title"] for news in public["news"]])
+
+    def test_browser_editor_writes_are_visible_in_native_editor(self):
+        self.client.force_login(self.developer)
+        response = self.client.post(reverse("player_site_editor"), data={
+            "title": "ASHFALL",
+            "is_published": "on",
+            "tagline": "Изменено через Nightwell Dev",
+        })
+        self.assertEqual(response.status_code, 302, response.content)
+        self.client.logout()
+        token = self._login_token(self.developer)
+        native = self.client.get(
+            reverse("native_player_site"),
+            HTTP_AUTHORIZATION="Bearer " + token,
+        )
+        self.assertEqual(native.status_code, 200, native.content)
+        self.assertEqual(native.json()["page"]["tagline"], "Изменено через Nightwell Dev")
+
     def _login_token(self, user):
         response = self.client.post(
             reverse("native_login"),
