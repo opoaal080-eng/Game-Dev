@@ -600,6 +600,7 @@ struct MoreScreen: View {
     var body: some View {
         List {
             Section("Проект") {
+                NavigationLink { AshfallSiteScreen() } label: { Label("Сайт ASHFALL", systemImage: "globe.europe.africa.fill") }
                 NavigationLink { FilesScreen() } label: { Label("Файлы", systemImage: "folder.fill") }
                 NavigationLink { TeamScreen() } label: { Label("Команда", systemImage: "person.2.fill") }
             }
