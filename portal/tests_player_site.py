@@ -45,6 +45,7 @@ class AshfallPublicSiteTests(TestCase):
         self.assertIn("public", response["Cache-Control"])
         data = response.json()
         self.assertEqual(data["title"], "ASHFALL")
+        self.assertEqual(data["eyebrow"], "NIGHTWELL STUDIO · ИГРОВОЙ ПРОЕКТ")
         self.assertEqual(data["genre"], "Тестовый жанр")
         self.assertEqual(len(data["news"]), 1)
         self.assertNotIn(self.secret, response.content.decode())
