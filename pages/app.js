@@ -146,7 +146,7 @@
       tasks:renderTasks,files:renderFiles,team:renderTeam,player:renderPlayer})[page](c);
   }
   function renderHome(c){
-    add(c,buildHead("NIGHTWELL / РАБОЧЕЕ ПРОСТРАНСТВО","Твоя команда.","Здесь собираются идеи, события и задачи команды Nightwell."));
+    add(c,buildHead("NIGHTWELL STUDIO / РАБОЧЕЕ ПРОСТРАНСТВО","Твоя команда.","Здесь собираются идеи, события и задачи команды Nightwell Studio."));
     const hero=node("section","hero");
     add(hero,line("РАБОЧЕЕ ПРОСТРАНСТВО КОМАНДЫ"),title("Все идеи.\nОдна история.","h2"),
       sub("От первых заметок до проработанного мира игры."),
@@ -261,7 +261,7 @@
     c.append(list);
   }
   function renderTeam(c){
-    add(c,buildHead("NIGHTWELL / УЧАСТНИКИ","Команда.","Разработчики и роли проекта."));
+    add(c,buildHead("NIGHTWELL STUDIO / УЧАСТНИКИ","Команда.","Разработчики и роли проекта."));
     const grid=node("div","character-grid");
     state.team.forEach(m=>{
       const b=box(node("div","char-avatar",(m.username||"?").slice(0,1).toUpperCase()),
