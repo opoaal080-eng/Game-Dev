@@ -96,7 +96,7 @@ private fun Login(client: DevBackend) {
                 Text("N", fontSize = 27.sp, fontWeight = FontWeight.Black, color = background)
             }
             Column {
-                Text("NIGHTWELL", fontWeight = FontWeight.ExtraBold, letterSpacing = 1.9.sp)
+                Text("NIGHTWELL STUDIO", fontWeight = FontWeight.ExtraBold, fontSize = 15.sp, letterSpacing = 1.sp)
                 Text("DEVELOPER SPACE", color = muted, fontSize = 10.sp, letterSpacing = 1.5.sp)
             }
         }
@@ -147,7 +147,7 @@ private fun Workspace(client: DevBackend) {
         containerColor = background,
         topBar = {
             TopAppBar(
-                title = { Text("NIGHTWELL  /  " + tab.label.uppercase(), fontSize = 11.sp, fontWeight = FontWeight.Bold, letterSpacing = 1.1.sp) },
+                title = { Text("NIGHTWELL STUDIO  /  " + tab.label.uppercase(), fontSize = 11.sp, fontWeight = FontWeight.Bold, letterSpacing = 1.1.sp) },
                 actions = {
                     IconButton(onClick = { scope.launch { client.refresh() } }) {
                         Icon(Icons.Default.Refresh, contentDescription = "Обновить")
@@ -193,7 +193,7 @@ private fun Workspace(client: DevBackend) {
 @Composable
 private fun Overview(client: DevBackend) {
     LazyColumn(contentPadding = PaddingValues(18.dp), verticalArrangement = Arrangement.spacedBy(14.dp)) {
-        item { Header("Твоя команда.", "NIGHTWELL / WORKSPACE") }
+        item { Header("Твоя команда.", "NIGHTWELL STUDIO / WORKSPACE") }
         item {
             GlassCard {
                 Text("СОЗДАВАЙТЕ МИРЫ ВМЕСТЕ", fontSize = 10.sp, fontWeight = FontWeight.Bold, letterSpacing = 1.3.sp, color = muted)
@@ -565,7 +565,7 @@ private fun More(client: DevBackend) {
         }
     }
     LazyColumn(contentPadding = PaddingValues(18.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-        item { Header(when (subsection) { "files" -> "Файлы."; "team" -> "Команда."; "password" -> "Пароль."; else -> "Ещё." }, "NIGHTWELL / WORKSPACE") }
+        item { Header(when (subsection) { "files" -> "Файлы."; "team" -> "Команда."; "password" -> "Пароль."; else -> "Ещё." }, "NIGHTWELL STUDIO / WORKSPACE") }
         if (subsection.isNotEmpty()) item { OutlinedButton(onClick = { subsection = "" }) {
             Icon(Icons.Default.ArrowBack, null); Text(" Назад")
         } }
