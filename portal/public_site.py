@@ -30,7 +30,7 @@ def public_payload():
     if not page:
         return {
             "schema": 1, "published": False, "title": "ASHFALL",
-            "eyebrow": "NIGHTWELL · ИГРОВОЙ ПРОЕКТ", "tagline": "",
+            "eyebrow": "NIGHTWELL STUDIO · ИГРОВОЙ ПРОЕКТ", "tagline": "",
             "introduction": "", "story_teaser": "", "world_description": "",
             "feature_lines": [], "genre": "", "platforms": "",
             "development_status": "", "release_window": "", "hero_image_url": "",
