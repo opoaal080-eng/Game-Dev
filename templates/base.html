@@ -9,7 +9,7 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Nightwell Dev">
   <meta name="robots" content="noindex,nofollow,noarchive">
-  <title>{% block title %}Nightwell Dev{% endblock %} · Nightwell</title>
+  <title>{% block title %}Nightwell Dev{% endblock %} · Nightwell Studio</title>
   <link rel="icon" href="{% static 'img/favicon.svg' %}" type="image/svg+xml">
   <link rel="stylesheet" href="{% static 'css/app.css' %}">
   <link rel="stylesheet" href="{% static 'css/nightwell-ios.css' %}">
@@ -21,7 +21,7 @@
   <aside class="sidebar" id="sidebar">
     <a class="brand" href="{% url 'dashboard' %}" aria-label="На главную">
       <span class="brand-mark">N</span>
-      <span class="brand-copy"><b>NIGHTWELL</b><small>DEVELOPER SPACE</small></span>
+      <span class="brand-copy"><b>NIGHTWELL STUDIO</b><small>DEVELOPER SPACE</small></span>
     </a>
     <div class="workspace-label"><span class="online-dot"></span> PRIVATE WORKSPACE</div>
     <nav class="side-nav" aria-label="Главное меню">
@@ -46,14 +46,14 @@
   <main class="main">
     <header class="topbar">
       <button class="mobile-menu" type="button" aria-label="Открыть меню" aria-expanded="false" aria-controls="sidebar" id="menuToggle" data-mobile-menu><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button>
-      <span class="crumb">NIGHTWELL <span>/</span> {% block crumb %}WORKSPACE{% endblock %}</span>
+      <span class="crumb">NIGHTWELL STUDIO <span>/</span> {% block crumb %}WORKSPACE{% endblock %}</span>
       <form class="search" action="{% url 'search' %}" method="get"><span class="search-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.8" cy="10.8" r="6.7"/><path d="m16 16 4 4"/></svg></span><input type="search" name="q" value="{{ request.GET.q|default:'' }}" placeholder="Поиск по пространству" aria-label="Поиск"><kbd>/</kbd></form>
       <div class="topbar-user">{{ request.user.username|slice:':1'|upper }}</div>
     </header>
     <div class="main-content">
       {% if messages %}<div class="alerts" role="status">{% for message in messages %}<div class="alert">{{ message }}</div>{% endfor %}</div>{% endif %}
       {% block content %}{% endblock %}
-      <footer class="footer"><span>© Nightwell Dev · Закрытое пространство</span><span>v0.1 · INTERNAL</span></footer>
+      <footer class="footer"><span>© Nightwell Studio · Nightwell Dev</span><span>v0.1 · INTERNAL</span></footer>
     </div>
   </main>
   <div class="overlay" id="overlay"></div>
