@@ -49,6 +49,10 @@ class Post(models.Model):
         MEETING = "meeting", "Встреча"
         DECISION = "decision", "Решение"
 
+    class ContentMode(models.TextChoices):
+        MARKDOWN = "markdown", "Текст и Markdown"
+        CODE = "code", "Скрипт целиком"
+
     class Status(models.TextChoices):
         DRAFT = "draft", "Черновик"
         PUBLISHED = "published", "Опубликовано"
@@ -59,6 +63,8 @@ class Post(models.Model):
     kind = models.CharField("Тип", max_length=16, choices=Kind.choices, default=Kind.NOTE)
     status = models.CharField("Статус", max_length=12, choices=Status.choices, default=Status.DRAFT)
     pinned = models.BooleanField("Закрепить", default=False)
+    content_mode = models.CharField("Формат содержимого", max_length=12, choices=ContentMode.choices, default=ContentMode.MARKDOWN)
+    code_language = models.CharField("Язык кода", max_length=32, blank=True, default="")
     author = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.PROTECT, related_name="dev_posts")
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
