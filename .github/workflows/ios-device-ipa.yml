@@ -20,10 +20,8 @@ jobs:
       - name: Prepare Nightwell Studio app icon
         run: |
           set -euo pipefail
-          SOURCE="clients/ios/IconSource/NightwellStudio.jpg"
           OUTPUT="clients/ios/NightwellDev/Assets.xcassets/AppIcon.appiconset/AppIcon.png"
-          test -s "$SOURCE"
-          sips -s format png -z 1024 1024 "$SOURCE" --out "$OUTPUT"
+          swift clients/ios/IconSource/generate_icon.swift "$OUTPUT"
           sips -g pixelHeight -g pixelWidth "$OUTPUT"
           test -s "$OUTPUT"
       - name: Generate Xcode project
