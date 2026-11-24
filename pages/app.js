@@ -230,8 +230,52 @@
     const pre=node("div","filter-row");pre.append(action("← Назад",()=>view(p.kind==="doc"?"docs":"journal")));c.append(pre);
     add(c,buildHead((KINDS[p.kind]||p.kind).toUpperCase(),p.title,p.author+" · "+datestr(p.updated_at)));
     const body=box(line("СОДЕРЖАНИЕ"));
-    const preText=node("div","",p.body||"");preText.style.whiteSpace="pre-wrap";preText.style.lineHeight="1.8";preText.style.marginTop="15px";
-    body.append(preText);c.append(body);
+    body.append(renderDocBody(p));c.append(body);
+  }
+
+  function addScriptPanel(root, code, language) {
+    const panel=node("section","script-panel");
+    const head=node("div","script-panel-head");
+    const label=node("span","",language||"Исходный код");
+    const button=action("Копировать",async()=>{
+      try{await navigator.clipboard.writeText(code);toast("Скрипт скопирован целиком")}
+      catch(e){toast("Не удалось скопировать код")}
+    });
+    add(head,label,button);
+    const pre=node("pre","script-panel-pre");
+    pre.append(node("code","",code));
+    add(panel,head,pre);root.append(panel);
+  }
+  function renderDocBody(post) {
+    const root=node("div","doc-body");
+    const text=String(post.body||"");
+    if(post.content_mode==="code"){
+      addScriptPanel(root,text,post.code_language||"Скрипт");
+      return root;
+    }
+    const lines=text.replace(/\r\n?/g,"\n").split("\n");
+    const tick=String.fromCharCode(96);
+    const open=new RegExp("^ {0,3}(("+tick+"{3,}|~{3,}))(.*)$");
+    let paragraph=[],index=0;
+    const flush=()=>{
+      if(!paragraph.length)return;
+      const prose=node("div","doc-prose",paragraph.join("\n"));
+      prose.style.whiteSpace="pre-wrap";root.append(prose);paragraph=[];
+    };
+    while(index<lines.length){
+      const match=lines[index].match(open);
+      if(!match){paragraph.push(lines[index++]);continue}
+      flush();index++;
+      const fence=match[1],lang=match[2].trim().slice(0,48);
+      const chunk=[];
+      const close=new RegExp("^ {0,3}"+fence[0]+"{"+fence.length+",}[ \\t]*$");
+      while(index<lines.length && !close.test(lines[index])){
+        chunk.push(lines[index++]);
+      }
+      if(index<lines.length)index++;
+      addScriptPanel(root,chunk.join("\n"),lang||"Код");
+    }
+    flush();return root;
   }
   function renderTasks(c){
     add(c,buildHead("WORKFLOW / РАЗРАБОТКА","Задачи.","Канбан-доска с приоритетами и исполнителями.",
@@ -450,7 +494,9 @@
       field("title","Заголовок",p.title,"text",{required:true,maxLength:180}),
       field("kind","Тип",p.kind||(docs?"doc":"note"),"select",{options:Object.entries(KINDS)}),
       field("status","Публикация",p.status||"published","select",{options:[["published","Опубликовано"],["draft","Черновик"]]}),
-      field("body","Содержание (Markdown)",p.body,"textarea",{required:true}),
+      field("content_mode","Отображение содержимого",p.content_mode||"markdown","select",{options:[["markdown","Текст и Markdown"],["code","Скрипт целиком, одним окном"]]}),
+      field("code_language","Язык скрипта, например csharp, python, js",p.code_language||""),
+      field("body","Содержимое документа или весь скрипт",p.body,"textarea",{required:true}),
       field("pinned","Закрепить",p.pinned||false,"checkbox")
     ],async data=>{
       data.project=post?.project_id||state.currentProject;
