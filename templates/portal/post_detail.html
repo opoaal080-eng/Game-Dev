@@ -1,5 +1,12 @@
 {% extends 'base.html' %}{% load content %}
 {% block title %}{{ post.title }}{% endblock %}{% block crumb %}ПУБЛИКАЦИЯ{% endblock %}
 {% block content %}
-<div class="detail-wrap"><a href="{% if post.kind == 'doc' %}{% url 'docs' %}{% else %}{% url 'posts' %}{% endif %}" class="back-link">← Вернуться к записям</a><article class="detail-article"><div class="article-meta"><span class="tag tag-purple">{{ post.get_kind_display }}</span>{% if post.status == 'draft' %}<span class="tag tag-warning">Черновик</span>{% endif %}<span class="date">{{ post.updated_at|date:'d.m.Y H:i' }}</span></div><h1>{{ post.title }}</h1><div class="detail-byline"><span class="tiny-avatar">{{ post.author.username|slice:':1'|upper }}</span><span>{{ post.author.get_full_name|default:post.author.username }}</span><span class="separator-dot">·</span><span>{{ post.project.title }}</span></div><div class="markdown-body">{{ post.body|render_markdown }}</div></article>{% if may_edit %}<a href="{% url 'post_edit' post.pk %}" class="btn btn-ghost">✎ Редактировать</a>{% endif %}</div>
+<div class="detail-wrap"><a href="{% if post.kind == 'doc' %}{% url 'docs' %}{% else %}{% url 'posts' %}{% endif %}" class="back-link">← Вернуться к записям</a><article class="detail-article"><div class="article-meta"><span class="tag tag-purple">{{ post.get_kind_display }}</span>{% if post.status == 'draft' %}<span class="tag tag-warning">Черновик</span>{% endif %}<span class="date">{{ post.updated_at|date:'d.m.Y H:i' }}</span></div><h1>{{ post.title }}</h1><div class="detail-byline"><span class="tiny-avatar">{{ post.author.username|slice:':1'|upper }}</span><span>{{ post.author.get_full_name|default:post.author.username }}</span><span class="separator-dot">·</span><span>{{ post.project.title }}</span></div>{% if post.content_mode == 'code' %}
+<div class="code-panel">
+  <div class="code-panel-header"><span>{{ post.code_language|default:"Скрипт" }}</span><button type="button" class="code-copy" data-copy-code>Копировать код</button></div>
+  <pre class="code-panel-pre"><code>{{ post.body }}</code></pre>
+</div>
+{% else %}
+<div class="markdown-body">{{ post.body|render_markdown }}</div>
+{% endif %}</article>{% if may_edit %}<a href="{% url 'post_edit' post.pk %}" class="btn btn-ghost">✎ Редактировать</a>{% endif %}</div>
 {% endblock %}
