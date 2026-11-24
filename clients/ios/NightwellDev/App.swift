@@ -167,6 +167,12 @@ struct OverviewScreen: View {
         ScrollView {
             VStack(alignment: .leading, spacing: 18) {
                 HeaderLabel(title: "Твоя команда.", caption: "NIGHTWELL STUDIO / РАБОЧЕЕ ПРОСТРАНСТВО")
+                Text("Сервер: " + store.serverOrigin)
+                    .font(.caption2).foregroundStyle(Palette.muted)
+                    .textSelection(.enabled)
+                if let problem = store.sectionErrors["Главная"] {
+                    Notice(text: "Обзор: " + problem)
+                }
                 GlassCard {
                     VStack(alignment: .leading, spacing: 16) {
                         Text("СОЗДАВАЙТЕ МИРЫ ВМЕСТЕ").font(.caption2.bold()).tracking(1.5).foregroundStyle(Palette.muted)
@@ -297,10 +303,15 @@ struct GameInformationScreen: View {
                             if !c.bio.isEmpty { Text(c.bio).font(.subheadline).foregroundStyle(Palette.muted).padding(.top, 9) }
                         }
                     }
-                } else {
+                } else if store.sectionErrors["Информация"] == nil {
                     GlassCard { Text("Информация загружается...").foregroundStyle(Palette.muted) }
                 }
-                if let error = store.errorMessage { Notice(text: error) }
+                if let error = store.sectionErrors["Информация"] {
+                    Notice(text: "Информация: " + error)
+                    QuietButton(title: "Повторить", symbol: "arrow.clockwise") {
+                        Task { await store.loadBible() }
+                    }
+                }
             }.padding(18)
         }
         .background(Palette.background)
@@ -637,6 +648,7 @@ struct PostEditor: View {
 struct TasksScreen: View {
     @EnvironmentObject var store: DevStore
     @State private var showEditor = false
+    @State private var taskError: String?
     private func statusLabel(_ value: String) -> String {
         switch value {
         case "todo": return "К выполнению"
@@ -649,6 +661,8 @@ struct TasksScreen: View {
         ScrollView {
             VStack(alignment: .leading, spacing: 17) {
                 HeaderLabel(title: "Задачи.", caption: "ДОСКА РАЗРАБОТКИ")
+                if let error = store.sectionErrors["Задачи"] { Notice(text: "Задачи: " + error) }
+                if let taskError { Notice(text: taskError) }
                 ForEach(["todo", "progress", "review", "done"], id: \.self) { code in
                     Text(statusLabel(code)).font(.title3.bold()).padding(.top, 5)
                     ForEach(store.tasks.filter { $0.status == code }) { task in
@@ -664,7 +678,12 @@ struct TasksScreen: View {
                                         (store.user?.role == "admin" || store.user?.id == task.created_by_id || store.user?.id == task.assignee_id) {
                                         Menu {
                                             ForEach(["todo", "progress", "review", "done"], id: \.self) { value in
-                                                Button(statusLabel(value)) { Task { try? await store.updateTask(task, status: value) } }
+                                                Button(statusLabel(value)) {
+                                                    Task {
+                                                        do { try await store.updateTask(task, status: value); taskError = nil }
+                                                        catch { taskError = error.localizedDescription }
+                                                    }
+                                                }
                                             }
                                         } label: {
                                             Label("Статус", systemImage: "chevron.down").font(.caption)
@@ -732,6 +751,7 @@ struct MoreScreen: View {
                 Label(store.serverOrigin, systemImage: "server.rack")
                     .font(.footnote).textSelection(.enabled)
                 Button("Обновить данные") { Task { await store.refresh() } }
+                Button("Сменить сервер") { Task { await store.logout() } }
             }
             Section("Аккаунт") {
                 HStack { Label("Пользователь", systemImage: "person.crop.circle"); Spacer(); Text(store.user?.username ?? "").foregroundStyle(Palette.muted) }
@@ -857,6 +877,7 @@ struct TeamScreen: View {
     var body: some View {
         ScrollView {
             LazyVStack(spacing: 12) {
+                if let error = store.sectionErrors["Команда"] { Notice(text: "Команда: " + error) }
                 ForEach(store.team) { person in
                     GlassCard {
                         HStack(spacing: 13) {
