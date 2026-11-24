@@ -165,6 +165,28 @@ final class DevStore: ObservableObject {
         catch { return .failure(error) }
     }
 
+    private func attemptPages<T: Decodable & Identifiable>(
+        _ endpoint: String, pageSize: Int, as type: T.Type
+    ) async -> Result<ItemsReply<T>, Error> where T.ID == Int {
+        do {
+            var collected: [T] = []
+            var seen = Set<Int>()
+            for page in 0..<20 {
+                let separator = endpoint.contains("?") ? "&" : "?"
+                let path = "\(endpoint)\(separator)offset=\(page * pageSize)&limit=\(pageSize)"
+                let reply: ItemsReply<T> = try await fetch(path)
+                let fresh = reply.items.filter { seen.insert($0.id).inserted }
+                collected.append(contentsOf: fresh)
+                // Servers without pagination support return the same IDs.
+                // Stop safely instead of duplicating items or looping forever.
+                if reply.items.count < pageSize || fresh.isEmpty { break }
+            }
+            return .success(ItemsReply(items: collected))
+        } catch {
+            return .failure(error)
+        }
+    }
+
     func refresh() async {
         guard signedIn, !refreshing else { return }
         refreshing = true
@@ -173,11 +195,11 @@ final class DevStore: ObservableObject {
         async let meCall = attempt("me/", as: MeReply.self)
         async let projectsCall = attempt("projects/", as: ItemsReply<DevProject>.self)
         async let dashboardCall = attempt("dashboard/", as: DashboardReply.self)
-        async let postsCall = attempt("posts/", as: ItemsReply<DevPost>.self)
+        async let postsCall = attemptPages("posts/", pageSize: 100, as: DevPost.self)
         // Older documentation should not disappear behind the first 100 general posts.
-        async let documentsCall = attempt("posts/?kind=doc", as: ItemsReply<DevPost>.self)
+        async let documentsCall = attemptPages("posts/?kind=doc", pageSize: 100, as: DevPost.self)
         async let tasksCall = attempt("tasks/", as: ItemsReply<DevTask>.self)
-        async let filesCall = attempt("files/", as: ItemsReply<DevAsset>.self)
+        async let filesCall = attemptPages("files/", pageSize: 150, as: DevAsset.self)
         async let teamCall = attempt("team/", as: ItemsReply<APIUser>.self)
 
         let (me, projs, home, p, docs, t, f, members) = await (
