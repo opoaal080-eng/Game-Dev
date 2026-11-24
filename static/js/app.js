@@ -48,3 +48,15 @@
     });
   }
 })();
+document.querySelectorAll("[data-copy-code]").forEach((button) => {
+  button.addEventListener("click", async () => {
+    const code = button.closest(".code-panel")?.querySelector("pre code")?.textContent || "";
+    try {
+      await navigator.clipboard.writeText(code);
+      button.textContent = "Скопировано ✓";
+    } catch (_) {
+      button.textContent = "Не удалось скопировать";
+    }
+    window.setTimeout(() => { button.textContent = "Копировать код"; }, 2000);
+  });
+});
