@@ -60,3 +60,64 @@ class NativeRoutesTests(TestCase):
         other_site = self.client.get(reverse("native_me"), HTTP_ORIGIN="https://untrusted.example")
         self.assertEqual(other_site.status_code, 401)
         self.assertNotIn("Access-Control-Allow-Origin", other_site)
+
+
+class NativePaginationTests(TestCase):
+    def setUp(self):
+        import json
+        from django.contrib.auth import get_user_model
+        from .models import Asset, Post, Project, Profile
+        from django.core.files.base import ContentFile
+
+        self.user = get_user_model().objects.create_user(
+            "pagination-dev", password="secure-pagination-test-123"
+        )
+        profile, _ = Profile.objects.get_or_create(user=self.user)
+        profile.role = Profile.Role.DEVELOPER
+        profile.save()
+        project = Project.objects.get(slug="main")
+        for index in range(4):
+            Post.objects.create(
+                author=self.user, project=project, title=f"Manual {index}",
+                body="Test source", kind="doc", status="published"
+            )
+            asset = Asset(
+                project=project, title=f"Asset {index}",
+                original_name=f"sample{index}.custom", size=4,
+                uploaded_by=self.user,
+            )
+            asset.file.save(f"sample{index}.custom", ContentFile(b"test"), save=True)
+        response = self.client.post(
+            reverse("native_login"),
+            data=json.dumps({
+                "username": self.user.username,
+                "password": "secure-pagination-test-123"
+            }),
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, 200)
+        self.headers = {"HTTP_AUTHORIZATION": "Bearer " + response.json()["token"]}
+
+    def test_post_and_file_pagination_keeps_all_records_accessible(self):
+        for route in ("native_posts", "native_files"):
+            with self.subTest(route=route):
+                first = self.client.get(
+                    reverse(route) + "?offset=0&limit=2", **self.headers
+                )
+                next_page = self.client.get(
+                    reverse(route) + "?offset=2&limit=2", **self.headers
+                )
+                self.assertEqual(first.status_code, 200)
+                self.assertEqual(next_page.status_code, 200)
+                self.assertEqual(len(first.json()["items"]), 2)
+                self.assertEqual(len(next_page.json()["items"]), 2)
+                ids = [x["id"] for x in first.json()["items"] + next_page.json()["items"]]
+                self.assertEqual(len(ids), len(set(ids)))
+
+    def test_document_kind_filter_and_offset(self):
+        result = self.client.get(
+            reverse("native_posts") + "?kind=doc&offset=1&limit=2", **self.headers
+        )
+        self.assertEqual(result.status_code, 200)
+        self.assertEqual(len(result.json()["items"]), 2)
+        self.assertTrue(all(p["kind"] == "doc" for p in result.json()["items"]))
