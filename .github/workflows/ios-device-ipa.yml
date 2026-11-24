@@ -14,7 +14,7 @@ permissions:
 jobs:
   iphone-ipa:
     name: Build unsigned iPhone IPA
-    runs-on: macos-26
+    runs-on: macos-15
     steps:
       - uses: actions/checkout@v4
       - name: Prepare Nightwell Studio app icon
