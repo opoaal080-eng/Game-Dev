@@ -128,6 +128,16 @@ def native_posts(user):
         qs = qs.filter(status="published")
     return qs
 
+def page_window(request, limit):
+    """Backward-compatible pagination. Existing clients still get first page."""
+    try:
+        offset = int(request.GET.get("offset", "0"))
+        requested = int(request.GET.get("limit", str(limit)))
+    except (TypeError, ValueError):
+        return 0, limit
+    return max(0, min(offset, 100000)), max(1, min(requested, limit))
+
+
 
 @csrf_exempt
 @require_http_methods(["POST"])
@@ -229,7 +239,8 @@ def posts(request):
         p = request.GET.get("project", "")
         if p.isdigit():
             qs = qs.filter(project_id=int(p))
-        return JsonResponse({"items": [post_json(item) for item in qs[:100]]})
+        offset, limit = page_window(request, 100)
+        return JsonResponse({"items": [post_json(item) for item in qs[offset:offset + limit]]})
     if not can_write(request.native_user):
         return error("Недостаточно прав", 403)
     try:
@@ -326,7 +337,8 @@ def files(request):
         p = request.GET.get("project", "")
         if p.isdigit():
             qs = qs.filter(project_id=int(p))
-        return JsonResponse({"items": [asset_json(a) for a in qs[:150]]})
+        offset, limit = page_window(request, 150)
+        return JsonResponse({"items": [asset_json(a) for a in qs[offset:offset + limit]]})
     if not can_write(request.native_user):
         return error("Недостаточно прав", 403)
     form = AssetForm(request.POST, request.FILES)
