@@ -171,12 +171,14 @@ final class DevStore: ObservableObject {
         async let projectsCall = attempt("projects/", as: ItemsReply<DevProject>.self)
         async let dashboardCall = attempt("dashboard/", as: DashboardReply.self)
         async let postsCall = attempt("posts/", as: ItemsReply<DevPost>.self)
+        // Older documentation should not disappear behind the first 100 general posts.
+        async let documentsCall = attempt("posts/?kind=doc", as: ItemsReply<DevPost>.self)
         async let tasksCall = attempt("tasks/", as: ItemsReply<DevTask>.self)
         async let filesCall = attempt("files/", as: ItemsReply<DevAsset>.self)
         async let teamCall = attempt("team/", as: ItemsReply<APIUser>.self)
 
-        let (me, projs, home, p, t, f, members) = await (
-            meCall, projectsCall, dashboardCall, postsCall,
+        let (me, projs, home, p, docs, t, f, members) = await (
+            meCall, projectsCall, dashboardCall, postsCall, documentsCall,
             tasksCall, filesCall, teamCall
         )
         guard signedIn else { return }
@@ -198,10 +200,21 @@ final class DevStore: ObservableObject {
         case .success(let reply): dashboard = reply
         case .failure(let error): failures["Главная"] = error.localizedDescription
         }
+        var mergedPosts: [Int: DevPost] = [:]
+        var hasPosts = false
         switch p {
-        case .success(let reply): posts = reply.items
+        case .success(let reply):
+            hasPosts = true
+            for item in reply.items { mergedPosts[item.id] = item }
+        case .failure(let error): failures["Публикации"] = error.localizedDescription
+        }
+        switch docs {
+        case .success(let reply):
+            hasPosts = true
+            for item in reply.items { mergedPosts[item.id] = item }
         case .failure(let error): failures["Документация"] = error.localizedDescription
         }
+        if hasPosts { posts = mergedPosts.values.sorted { $0.updated_at > $1.updated_at } }
         switch t {
         case .success(let reply): tasks = reply.items
         case .failure(let error): failures["Задачи"] = error.localizedDescription
