@@ -1,4 +1,5 @@
 import SwiftUI
+import UniformTypeIdentifiers
 
 private enum Palette {
     static let background = Color(red: 0.035, green: 0.039, blue: 0.047)
@@ -77,6 +78,7 @@ struct LoginScreen: View {
     @EnvironmentObject var store: DevStore
     @State private var username = ""
     @State private var password = ""
+    @State private var serverAddress = DevServer.selectedOrigin
     var body: some View {
         GeometryReader { proxy in
             ScrollView {
@@ -99,13 +101,28 @@ struct LoginScreen: View {
                         VStack(alignment: .leading, spacing: 17) {
                             Label("Закрытый доступ", systemImage: "lock.shield").font(.system(size: 12, weight: .semibold)).foregroundStyle(Palette.muted)
                             Text("Вход в Nightwell Dev").font(.title2.bold())
+                            Label("Подключение к серверу", systemImage: "server.rack")
+                                .font(.caption.bold()).foregroundStyle(Palette.muted)
+                            HStack(spacing: 8) {
+                                Button("Домашний") { serverAddress = DevServer.homeOrigin }
+                                Button("Railway") { serverAddress = DevServer.railwayOrigin }
+                            }
+                            .font(.caption.bold())
+                            .buttonStyle(.bordered)
+                            .tint(.white)
+                            TextField("https://адрес-твоего-сервера", text: $serverAddress)
+                                .keyboardType(.URL).textInputAutocapitalization(.never)
+                                .autocorrectionDisabled().textContentType(.URL)
+                                .padding(13).background(.white.opacity(0.07), in: RoundedRectangle(cornerRadius: 13))
+                            Text("Для файлов и документации выбери тот же сервер, на котором открыт сайт. Данные на разных серверах могут отличаться.")
+                                .font(.caption).foregroundStyle(Palette.muted)
                             TextField("Логин", text: $username).textInputAutocapitalization(.never).autocorrectionDisabled()
                                 .textContentType(.username).padding(15).background(.white.opacity(0.07), in: RoundedRectangle(cornerRadius: 14))
                             SecureField("Пароль", text: $password).textContentType(.password).padding(15)
                                 .background(.white.opacity(0.07), in: RoundedRectangle(cornerRadius: 14))
                             if let error = store.errorMessage { Notice(text: error) }
                             Button {
-                                Task { await store.login(username: username, password: password) }
+                                Task { await store.login(username: username, password: password, serverAddress: serverAddress) }
                             } label: {
                                 HStack { Text("Войти"); Spacer(); Image(systemName: "arrow.right") }
                                     .font(.system(size: 15, weight: .bold)).foregroundStyle(.black)
@@ -131,10 +148,10 @@ struct AppTabs: View {
         TabView {
             NavigationStack { OverviewScreen() }
                 .tabItem { Label("Главная", systemImage: "house.fill") }
-            NavigationStack { GameInformationScreen() }
-                .tabItem { Label("Инфо", systemImage: "info.circle.fill") }
-            NavigationStack { JournalScreen() }
-                .tabItem { Label("Дневник", systemImage: "book.pages") }
+            NavigationStack { DocumentationScreen() }
+                .tabItem { Label("Документы", systemImage: "books.vertical.fill") }
+            NavigationStack { FilesScreen() }
+                .tabItem { Label("Файлы", systemImage: "folder.fill") }
             NavigationStack { TasksScreen() }
                 .tabItem { Label("Задачи", systemImage: "checklist") }
             NavigationStack { MoreScreen() }
@@ -600,9 +617,15 @@ struct MoreScreen: View {
     var body: some View {
         List {
             Section("Проект") {
+                NavigationLink { GameInformationScreen() } label: { Label("Информация об игре", systemImage: "info.circle.fill") }
+                NavigationLink { JournalScreen() } label: { Label("Дневник разработки", systemImage: "book.pages.fill") }
                 NavigationLink { AshfallSiteScreen() } label: { Label("Сайт ASHFALL", systemImage: "globe.europe.africa.fill") }
-                NavigationLink { FilesScreen() } label: { Label("Файлы", systemImage: "folder.fill") }
                 NavigationLink { TeamScreen() } label: { Label("Команда", systemImage: "person.2.fill") }
+            }
+            Section("Сервер") {
+                Label(store.serverOrigin, systemImage: "server.rack")
+                    .font(.footnote).textSelection(.enabled)
+                Button("Обновить данные") { Task { await store.refresh() } }
             }
             Section("Аккаунт") {
                 HStack { Label("Пользователь", systemImage: "person.crop.circle"); Spacer(); Text(store.user?.username ?? "").foregroundStyle(Palette.muted) }
