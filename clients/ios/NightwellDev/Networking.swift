@@ -79,6 +79,7 @@ final class DevStore: ObservableObject {
     @Published var bible: BibleReply?
     @Published var currentProjectID: Int?
     @Published var busy = false
+    @Published var refreshing = false
     @Published var errorMessage: String?
     @Published var sectionErrors: [String: String] = [:]
     @Published var serverOrigin: String
@@ -165,7 +166,9 @@ final class DevStore: ObservableObject {
     }
 
     func refresh() async {
-        guard signedIn else { return }
+        guard signedIn, !refreshing else { return }
+        refreshing = true
+        defer { refreshing = false }
         // Independent results: a failed request must not hide documents, files or tasks.
         async let meCall = attempt("me/", as: MeReply.self)
         async let projectsCall = attempt("projects/", as: ItemsReply<DevProject>.self)
