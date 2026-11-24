@@ -9,6 +9,19 @@ class PostForm(forms.ModelForm):
         fields = ["project", "title", "kind", "status", "pinned", "content_mode", "code_language", "body"]
         widgets = {"body": forms.Textarea(attrs={"rows": 14, "placeholder": "Заметки, ссылки, списки и решения команды…"})}
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Backward compatibility for older app clients that do not yet send this field.
+        self.fields["content_mode"].required = False
+
+    def clean_content_mode(self):
+        value = self.cleaned_data.get("content_mode")
+        if value:
+            return value
+        if self.instance.pk:
+            return self.instance.content_mode
+        return Post.ContentMode.MARKDOWN
+
 
 class TaskForm(forms.ModelForm):
     class Meta:
