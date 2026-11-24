@@ -81,6 +81,7 @@ def project_json(project):
 def post_json(post):
     return {"id": post.pk, "project_id": post.project_id, "project": post.project.title,
             "title": post.title, "body": post.body, "kind": post.kind, "status": post.status,
+            "content_mode": post.content_mode, "code_language": post.code_language,
             "pinned": post.pinned, "author": post.author.username,
             "author_id": post.author_id, "updated_at": post.updated_at.isoformat()}
 
