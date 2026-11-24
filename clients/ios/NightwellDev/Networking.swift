@@ -93,7 +93,8 @@ final class DevStore: ObservableObject {
     }
 
     private func url(_ path: String) -> URL {
-        URL(string: serverOrigin + "/api/v1/")!.appendingPathComponent(path)
+        // URL.appendingPathComponent can escape embedded slashes in API paths.
+        URL(string: serverOrigin + "/api/v1/" + path)!
     }
 
     func configureServer(_ address: String) throws {
