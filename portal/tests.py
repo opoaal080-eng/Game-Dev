@@ -119,11 +119,54 @@ class PrivateFilesTests(TestCase):
         self.assertIn("attachment", download["Content-Disposition"])
         self.assertEqual(self.client.get("/not-publicly-served/" + asset.file.name).status_code, 404)
 
-    def test_extension_filter(self):
+    def test_any_file_extension_is_allowed_but_download_stays_private(self):
         self.client.force_login(self.user)
-        response = self.client.post(reverse("asset_create"), {
-            "project": self.project.pk, "title": "Unsafe file", "description": "", "file": SimpleUploadedFile("script.exe", b"malware"),
-        })
+        data = b"binary sample without executing"
+        for name in ("script.exe", "scene.unitypackage", "objects.customext"):
+            response = self.client.post(reverse("asset_create"), {
+                "project": self.project.pk, "title": name, "description": "",
+                "file": SimpleUploadedFile(name, data, content_type="application/octet-stream"),
+            })
+            self.assertEqual(response.status_code, 302, response.content)
+            item = Asset.objects.get(title=name)
+            self.client.logout()
+            self.assertEqual(self.client.get(reverse("asset_download", args=[item.pk])).status_code, 302)
+            self.client.force_login(self.user)
+            download = self.client.get(reverse("asset_download", args=[item.pk]))
+            self.assertEqual(download.status_code, 200)
+            self.assertEqual(download["Content-Type"], "application/octet-stream")
+            self.assertIn("attachment", download["Content-Disposition"])
+            self.assertEqual(b"".join(download.streaming_content), data)
+
+
+class ScriptDocumentationTests(TestCase):
+    def setUp(self):
+        self.project = Project.objects.get(slug="main")
+        self.author = User.objects.create_user("script-author", password="strong test password 123")
+        self.author.dev_profile.role = Profile.Role.DEVELOPER
+        self.author.dev_profile.save()
+
+    def test_entire_script_is_displayed_literally_even_with_markdown_fences(self):
+        script = "def start():\\n    print('hello')\\n\\n```markdown\\n# This must stay in code\\n```\\n<script>alert(1)</script>"
+        post = Post.objects.create(
+            project=self.project, author=self.author, title="Full script",
+            kind=Post.Kind.DOC, status=Post.Status.PUBLISHED,
+            content_mode=Post.ContentMode.CODE, code_language="python", body=script,
+        )
+        self.client.force_login(self.author)
+        response = self.client.get(reverse("post_detail", args=[post.pk]))
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, "формат файла пока не разрешён")
-        self.assertFalse(Asset.objects.filter(title="Unsafe file").exists())
+        self.assertContains(response, 'class="code-panel"')
+        self.assertContains(response, 'class="code-panel-pre"')
+        self.assertContains(response, "&lt;script&gt;alert(1)&lt;/script&gt;")
+        self.assertNotContains(response, '<script>alert(1)</script>')
+        self.assertContains(response, "# This must stay in code")
+
+    def test_markdown_docs_still_render_normally(self):
+        post = Post.objects.create(
+            project=self.project, author=self.author, title="Markdown doc",
+            kind=Post.Kind.DOC, status=Post.Status.PUBLISHED, body="## Some heading",
+        )
+        self.client.force_login(self.author)
+        response = self.client.get(reverse("post_detail", args=[post.pk]))
+        self.assertContains(response, "<h2>Some heading</h2>", html=True)
