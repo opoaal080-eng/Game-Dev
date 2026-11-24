@@ -13,9 +13,14 @@ struct GlassCard<Content: View>: View {
     let content: Content
     init(@ViewBuilder content: () -> Content) { self.content = content() }
     var body: some View {
-        content.padding(18).frame(maxWidth: .infinity, alignment: .leading)
-            .background(Palette.tile, in: RoundedRectangle(cornerRadius: 24, style: .continuous))
-            .overlay(RoundedRectangle(cornerRadius: 24).strokeBorder(Palette.border, lineWidth: 0.8))
+        // Resolve multi-child ViewBuilder content into one vertical card before styling.
+        VStack(alignment: .leading, spacing: 8) {
+            content
+        }
+        .padding(18)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(Palette.tile, in: RoundedRectangle(cornerRadius: 24, style: .continuous))
+        .overlay(RoundedRectangle(cornerRadius: 24).strokeBorder(Palette.border, lineWidth: 0.8))
     }
 }
 
@@ -499,10 +504,12 @@ struct DocumentationScreen: View {
     var body: some View {
         ScrollView {
             LazyVStack(alignment: .leading, spacing: 14) {
-                HeaderLabel(title: "Документация.", caption: "NIGHTWELL STUDIO / БАЗА ЗНАНИЙ")
-                DataSourcePanel(itemName: "документы")
                 Text("Опубликованные инструкции, технические решения и скрипты команды.")
-                    .font(.subheadline).foregroundStyle(Palette.muted)
+                    .font(.subheadline)
+                    .foregroundStyle(Palette.muted)
+                    .fixedSize(horizontal: false, vertical: true)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                DataSourcePanel(itemName: "документы")
                 if let error = store.sectionErrors["Документация"] {
                     Notice(text: "Не удалось получить документацию: " + error)
                     QuietButton(title: "Повторить", symbol: "arrow.clockwise") {
@@ -520,24 +527,49 @@ struct DocumentationScreen: View {
                 ForEach(documents) { document in
                     NavigationLink { PostDetailsScreen(post: document) } label: {
                         GlassCard {
-                            HStack {
-                                Image(systemName: document.content_mode == "code" ? "curlybraces" : "doc.text")
-                                Text(document.content_mode == "code" ? "СКРИПТ" : "ДОКУМЕНТ")
-                            }.font(.caption2.bold()).foregroundStyle(Palette.muted)
-                            Text(document.title).font(.title3.bold()).foregroundStyle(.white)
-                                .padding(.top, 6)
-                            Text(document.body).font(.subheadline).foregroundStyle(Palette.muted)
-                                .lineLimit(3).padding(.top, 3)
+                            HStack(alignment: .center, spacing: 8) {
+                                Label(document.content_mode == "code" ? "СКРИПТ" : "ДОКУМЕНТ",
+                                      systemImage: document.content_mode == "code" ? "curlybraces" : "doc.text")
+                                    .font(.caption2.bold())
+                                    .foregroundStyle(Palette.muted)
+                                Spacer(minLength: 8)
+                                Image(systemName: "chevron.right")
+                                    .font(.caption.bold())
+                                    .foregroundStyle(Palette.muted)
+                                    .accessibilityHidden(true)
+                            }
+                            Text(document.title)
+                                .font(.title3.bold())
+                                .foregroundStyle(.white)
+                                .fixedSize(horizontal: false, vertical: true)
+                                .frame(maxWidth: .infinity, alignment: .leading)
+                            if !document.body.isEmpty {
+                                Text(document.body)
+                                    .font(.subheadline)
+                                    .foregroundStyle(Palette.muted)
+                                    .lineLimit(3)
+                                    .fixedSize(horizontal: false, vertical: true)
+                                    .frame(maxWidth: .infinity, alignment: .leading)
+                            }
                             Text(document.project + " · " + document.author)
-                                .font(.caption).foregroundStyle(Palette.muted).padding(.top, 8)
+                                .font(.caption)
+                                .foregroundStyle(Palette.muted)
+                                .fixedSize(horizontal: false, vertical: true)
+                                .padding(.top, 4)
                         }
+                        .multilineTextAlignment(.leading)
+                        .contentShape(Rectangle())
                     }
+                    .buttonStyle(.plain)
                 }
             }
             .padding(18)
         }
         .background(Palette.background)
         .navigationTitle("Документация")
+        .navigationBarTitleDisplayMode(.inline)
+        .toolbarBackground(Palette.background, for: .navigationBar)
+        .toolbarBackground(.visible, for: .navigationBar)
         .refreshable { await store.refresh() }
         .task { await store.refresh() }
         .toolbar {
@@ -619,7 +651,12 @@ struct PostDetailsScreen: View {
                     GlassCard { Text(post.body).font(.body).textSelection(.enabled) }
                 }
             }.padding(18)
-        }.navigationTitle("Публикация").background(Palette.background)
+        }
+        .navigationTitle("Публикация")
+        .navigationBarTitleDisplayMode(.inline)
+        .toolbarBackground(Palette.background, for: .navigationBar)
+        .toolbarBackground(.visible, for: .navigationBar)
+        .background(Palette.background)
     }
 }
 
