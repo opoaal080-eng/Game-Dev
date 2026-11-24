@@ -444,6 +444,67 @@ struct CharacterEditor: View {
     }
 }
 
+struct DocumentationScreen: View {
+    @EnvironmentObject var store: DevStore
+    @State private var showEditor = false
+
+    private var documents: [DevPost] {
+        store.posts.filter { $0.kind == "doc" }
+    }
+
+    var body: some View {
+        ScrollView {
+            LazyVStack(alignment: .leading, spacing: 14) {
+                HeaderLabel(title: "Документация.", caption: "NIGHTWELL STUDIO / БАЗА ЗНАНИЙ")
+                Text("Опубликованные инструкции, технические решения и скрипты команды.")
+                    .font(.subheadline).foregroundStyle(Palette.muted)
+                if let error = store.sectionErrors["Документация"] {
+                    Notice(text: "Не удалось получить документацию: " + error)
+                    QuietButton(title: "Повторить", symbol: "arrow.clockwise") {
+                        Task { await store.refresh() }
+                    }
+                }
+                if documents.isEmpty && store.sectionErrors["Документация"] == nil {
+                    GlassCard {
+                        Label("Документов пока нет", systemImage: "doc.text")
+                            .font(.headline)
+                        Text("Создай первый документ или обнови список, потянув экран вниз.")
+                            .font(.subheadline).foregroundStyle(Palette.muted)
+                    }
+                }
+                ForEach(documents) { document in
+                    NavigationLink { PostDetailsScreen(post: document) } label: {
+                        GlassCard {
+                            HStack {
+                                Image(systemName: document.content_mode == "code" ? "curlybraces" : "doc.text")
+                                Text(document.content_mode == "code" ? "СКРИПТ" : "ДОКУМЕНТ")
+                            }.font(.caption2.bold()).foregroundStyle(Palette.muted)
+                            Text(document.title).font(.title3.bold()).foregroundStyle(.white)
+                                .padding(.top, 6)
+                            Text(document.body).font(.subheadline).foregroundStyle(Palette.muted)
+                                .lineLimit(3).padding(.top, 3)
+                            Text(document.project + " · " + document.author)
+                                .font(.caption).foregroundStyle(Palette.muted).padding(.top, 8)
+                        }
+                    }
+                }
+            }
+            .padding(18)
+        }
+        .background(Palette.background)
+        .navigationTitle("Документация")
+        .refreshable { await store.refresh() }
+        .toolbar {
+            if store.user?.can_write == true {
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button { showEditor = true } label: { Image(systemName: "plus") }
+                }
+            }
+        }
+        .sheet(isPresented: $showEditor) { PostEditor(defaultKind: "doc") }
+    }
+}
+
 struct JournalScreen: View {
     @EnvironmentObject var store: DevStore
     @State private var mode = 0
@@ -487,7 +548,30 @@ struct PostDetailsScreen: View {
                 Text(post.kind.uppercased()).font(.caption2.bold()).tracking(1.4).foregroundStyle(Palette.muted)
                 Text(post.title).font(.largeTitle.bold())
                 Text(post.project + " · " + post.author).font(.caption).foregroundStyle(Palette.muted)
-                GlassCard { Text(post.body).font(.body).textSelection(.enabled) }
+                if post.content_mode == "code" {
+                    GlassCard {
+                        HStack {
+                            Label(post.code_language?.isEmpty == false ? (post.code_language ?? "Код") : "Исходный код",
+                                  systemImage: "curlybraces")
+                                .font(.caption.bold()).foregroundStyle(Palette.muted)
+                            Spacer()
+                            ShareLink(item: post.body) {
+                                Label("Копировать/поделиться", systemImage: "square.on.square")
+                                    .font(.caption)
+                            }
+                        }
+                        ScrollView(.horizontal) {
+                            Text(post.body)
+                                .font(.system(size: 12, design: .monospaced))
+                                .fixedSize(horizontal: true, vertical: false)
+                                .textSelection(.enabled)
+                                .padding(.vertical, 8)
+                        }
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                    }
+                } else {
+                    GlassCard { Text(post.body).font(.body).textSelection(.enabled) }
+                }
             }.padding(18)
         }.navigationTitle("Публикация").background(Palette.background)
     }
@@ -498,9 +582,16 @@ struct PostEditor: View {
     @Environment(\.dismiss) private var dismiss
     @State private var title = ""
     @State private var postBody = ""
-    @State private var kind = "note"
+    @State private var kind: String
     @State private var status = "published"
+    @State private var contentMode = "markdown"
+    @State private var codeLanguage = ""
     @State private var message: String?
+
+    init(defaultKind: String = "note") {
+        _kind = State(initialValue: defaultKind)
+    }
+
     var body: some View {
         NavigationStack {
             Form {
@@ -512,14 +603,29 @@ struct PostEditor: View {
                     Text("Решение").tag("decision")
                 }
                 Picker("Статус", selection: $status) { Text("Опубликовано").tag("published"); Text("Черновик").tag("draft") }
-                Section("Содержание") { TextEditor(text: $postBody).frame(minHeight: 200) }
+                if kind == "doc" {
+                    Picker("Отображение", selection: $contentMode) {
+                        Text("Текст и Markdown").tag("markdown")
+                        Text("Скрипт целиком").tag("code")
+                    }
+                    if contentMode == "code" {
+                        TextField("Язык кода: csharp, python, js", text: $codeLanguage)
+                            .textInputAutocapitalization(.never)
+                            .autocorrectionDisabled()
+                    }
+                }
+                Section("Содержание") {
+                    TextEditor(text: $postBody).frame(minHeight: 280)
+                        .font(contentMode == "code" ? .system(size: 13, design: .monospaced) : .body)
+                }
                 if let message { Text(message).foregroundStyle(.orange) }
             }.navigationTitle("Новая запись")
                 .toolbar {
                     ToolbarItem(placement: .cancellationAction) { Button("Отмена") { dismiss() } }
                     ToolbarItem(placement: .confirmationAction) { Button("Сохранить") {
                         Task {
-                            do { try await store.makePost(title: title, body: postBody, kind: kind, status: status); dismiss() }
+                            do { try await store.makePost(title: title, body: postBody, kind: kind, status: status,
+                                contentMode: kind == "doc" ? contentMode : "markdown", codeLanguage: codeLanguage); dismiss() }
                             catch { message = error.localizedDescription }
                         }
                     }.disabled(title.isEmpty) }
