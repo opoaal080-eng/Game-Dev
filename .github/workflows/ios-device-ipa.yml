@@ -17,6 +17,15 @@ jobs:
     runs-on: macos-26
     steps:
       - uses: actions/checkout@v4
+      - name: Prepare Nightwell Studio app icon
+        run: |
+          set -euo pipefail
+          SOURCE="clients/ios/IconSource/NightwellStudio.jpg"
+          OUTPUT="clients/ios/NightwellDev/Assets.xcassets/AppIcon.appiconset/AppIcon.png"
+          test -s "$SOURCE"
+          sips -s format png -z 1024 1024 "$SOURCE" --out "$OUTPUT"
+          sips -g pixelHeight -g pixelWidth "$OUTPUT"
+          test -s "$OUTPUT"
       - name: Generate Xcode project
         run: |
           brew install xcodegen
@@ -42,6 +51,8 @@ jobs:
           APP="$RUNNER_TEMP/iphone-build/Build/Products/Release-iphoneos/NightwellDev.app"
           test -n "$(find "$APP" -type d -name 'LaunchScreen.storyboardc' -print -quit)"
           echo "Explicit full-size LaunchScreen storyboard packaged successfully."
+          test -s "$APP/Assets.car"
+          echo "Compiled iOS app icon asset catalog present."
       - name: Create IPA with Payload directory
         run: |
           set -euo pipefail
@@ -50,23 +61,23 @@ jobs:
           mkdir -p "$RUNNER_TEMP/iphone-package/Payload"
           cp -R "$APP" "$RUNNER_TEMP/iphone-package/Payload/"
           cd "$RUNNER_TEMP/iphone-package"
-          zip -q -r "$RUNNER_TEMP/NightwellDev-iPhone-unsigned-v0.3.ipa" Payload
-          unzip -l "$RUNNER_TEMP/NightwellDev-iPhone-unsigned-v0.3.ipa" | grep -q 'Payload/NightwellDev.app/'
+          zip -q -r "$RUNNER_TEMP/NightwellDev-iPhone-unsigned-v0.4.ipa" Payload
+          unzip -l "$RUNNER_TEMP/NightwellDev-iPhone-unsigned-v0.4.ipa" | grep -q 'Payload/NightwellDev.app/'
       - name: Upload IPA as GitHub Actions artifact
         uses: actions/upload-artifact@v4
         with:
-          name: NightwellDev-iPhone-unsigned-v0.3-IPA
-          path: ${{ runner.temp }}/NightwellDev-iPhone-unsigned-v0.3.ipa
+          name: NightwellDev-iPhone-unsigned-v0.4-IPA
+          path: ${{ runner.temp }}/NightwellDev-iPhone-unsigned-v0.4.ipa
           if-no-files-found: error
       - name: Publish downloadable IPA as prerelease
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          gh release create "nightwell-dev-ios-unsigned-v0.3" \
-            "$RUNNER_TEMP/NightwellDev-iPhone-unsigned-v0.3.ipa#NightwellDev-iPhone-unsigned-v0.3.ipa" \
-            --title "Nightwell Dev for iPhone v0.3 (full-screen fix)" \
-            --notes "Fixed iPhone black bars using a compiled LaunchScreen storyboard, plus shorter tab labels. Native SwiftUI app compiled for physical iPhone. Unsigned build: sign with your own sideloading certificate before installation. Not an App Store or Apple Developer signed release." \
+          gh release create "nightwell-dev-ios-unsigned-v0.4" \
+            "$RUNNER_TEMP/NightwellDev-iPhone-unsigned-v0.4.ipa#NightwellDev-iPhone-unsigned-v0.4.ipa" \
+            --title "Nightwell Dev for iPhone v0.4 (documents, files, icon)" \
+            --notes "Fixed documents and files loading, configurable home server, independent refresh, native upload/download, code preview and Nightwell Studio app icon. Native SwiftUI app compiled for physical iPhone. Unsigned build: sign with your own sideloading certificate before installation. Not an App Store or Apple Developer signed release." \
             --prerelease \
             --target "${{ github.sha }}" \
-            || gh release upload "nightwell-dev-ios-unsigned-v0.3" \
-              "$RUNNER_TEMP/NightwellDev-iPhone-unsigned-v0.3.ipa#NightwellDev-iPhone-unsigned-v0.3.ipa" --clobber
+            || gh release upload "nightwell-dev-ios-unsigned-v0.4" \
+              "$RUNNER_TEMP/NightwellDev-iPhone-unsigned-v0.4.ipa#NightwellDev-iPhone-unsigned-v0.4.ipa" --clobber
