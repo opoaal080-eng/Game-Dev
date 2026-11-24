@@ -441,3 +441,14 @@ a.result-entry:hover { background:#ffffff0c; }
 @media (hover:hover) and (pointer:fine) {
   .member-card:hover,.task-card:hover { border-color:#ffffff2a; background:#ffffff0f; }
 }
+
+/* Whole-script documentation: a single, horizontally scrollable source panel. */
+.code-panel{width:100%;min-width:0;max-width:100%;margin:20px 0;border:1px solid #ffffff29;border-radius:16px;overflow:hidden;background:#090b0f}
+.code-panel-header{padding:11px 15px;background:#ffffff0b;border-bottom:1px solid #ffffff24;display:flex;align-items:center;justify-content:space-between;gap:14px;color:#bfc4cc;font-size:12px;font-weight:750}
+.code-copy{background:#ffffff15;border:1px solid #ffffff26;border-radius:9px;color:#fff;cursor:pointer;padding:8px 12px;font-size:12px}
+.code-copy:hover{background:#ffffff2b}
+.code-panel-pre{margin:0!important;padding:19px 20px!important;white-space:pre!important;overflow:auto!important;max-width:100%;background:transparent!important;border:0!important;border-radius:0!important;line-height:1.55;font-size:12px;tab-size:4;overscroll-behavior-x:contain}
+.code-panel-pre code{display:block;width:max-content;min-width:100%;color:#dce5e9;background:transparent!important;padding:0!important;font-family:ui-monospace,SFMono-Regular,Consolas,"Liberation Mono",monospace}
+.detail-article,.detail-wrap,.markdown-body{min-width:0;max-width:100%}
+.markdown-body pre{overflow:auto;white-space:pre}
+.markdown-body pre code{white-space:pre}
