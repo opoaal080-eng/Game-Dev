@@ -8,7 +8,7 @@ enum DevServer {
     private static let preferencesKey = "nightwell.dev.server.origin"
 
     static var selectedOrigin: String {
-        UserDefaults.standard.string(forKey: preferencesKey) ?? homeOrigin
+        UserDefaults.standard.string(forKey: preferencesKey) ?? railwayOrigin
     }
 
     static func validate(_ input: String) throws -> String {
