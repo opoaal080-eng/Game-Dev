@@ -60,23 +60,23 @@ jobs:
           mkdir -p "$RUNNER_TEMP/iphone-package/Payload"
           cp -R "$APP" "$RUNNER_TEMP/iphone-package/Payload/"
           cd "$RUNNER_TEMP/iphone-package"
-          zip -q -r "$RUNNER_TEMP/NightwellDev-iPhone-unsigned-v0.5.ipa" Payload
-          unzip -l "$RUNNER_TEMP/NightwellDev-iPhone-unsigned-v0.5.ipa" | grep -q 'Payload/NightwellDev.app/'
+          zip -q -r "$RUNNER_TEMP/NightwellDev-iPhone-unsigned-v0.6.ipa" Payload
+          unzip -l "$RUNNER_TEMP/NightwellDev-iPhone-unsigned-v0.6.ipa" | grep -q 'Payload/NightwellDev.app/'
       - name: Upload IPA as GitHub Actions artifact
         uses: actions/upload-artifact@v4
         with:
-          name: NightwellDev-iPhone-unsigned-v0.5-IPA
-          path: ${{ runner.temp }}/NightwellDev-iPhone-unsigned-v0.5.ipa
+          name: NightwellDev-iPhone-unsigned-v0.6-IPA
+          path: ${{ runner.temp }}/NightwellDev-iPhone-unsigned-v0.6.ipa
           if-no-files-found: error
       - name: Publish downloadable IPA as prerelease
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          gh release create "nightwell-dev-ios-unsigned-v0.5" \
-            "$RUNNER_TEMP/NightwellDev-iPhone-unsigned-v0.5.ipa#NightwellDev-iPhone-unsigned-v0.5.ipa" \
-            --title "Nightwell Dev for iPhone v0.5 (documents, files, icon fixes)" \
-            --notes "Fixed documents and files loading, configurable home server, independent refresh, native upload/download, code preview and Nightwell Studio app icon. Native SwiftUI app compiled for physical iPhone. Unsigned build: sign with your own sideloading certificate before installation. Not an App Store or Apple Developer signed release." \
+          gh release create "nightwell-dev-ios-unsigned-v0.6" \
+            "$RUNNER_TEMP/NightwellDev-iPhone-unsigned-v0.6.ipa#NightwellDev-iPhone-unsigned-v0.6.ipa" \
+            --title "Nightwell Dev for iPhone v0.6 (PC server sync, full document/file lists)" \
+            --notes "Document and file pagination, dedicated documentation queries, source-server visibility, refresh-on-open, home/Railway selection, native upload/download and Nightwell Studio icon. Native SwiftUI app compiled for physical iPhone. Unsigned build: sign with your own sideloading certificate before installation. Not an App Store or Apple Developer signed release." \
             --prerelease \
             --target "${{ github.sha }}" \
-            || gh release upload "nightwell-dev-ios-unsigned-v0.5" \
-              "$RUNNER_TEMP/NightwellDev-iPhone-unsigned-v0.5.ipa#NightwellDev-iPhone-unsigned-v0.5.ipa" --clobber
+            || gh release upload "nightwell-dev-ios-unsigned-v0.6" \
+              "$RUNNER_TEMP/NightwellDev-iPhone-unsigned-v0.6.ipa#NightwellDev-iPhone-unsigned-v0.6.ipa" --clobber
