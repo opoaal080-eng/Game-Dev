@@ -182,3 +182,13 @@ p{line-height:1.65}
 }
 @media(max-width:390px){.character-grid{grid-template-columns:1fr}.top-actions{gap:5px}.topbar{padding-left:11px;padding-right:11px}.top-title{font-size:9px}.mobile-dock{left:6px;right:6px}}
 @media(prefers-reduced-motion:reduce){*,*:before,*:after{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
+
+/* Full documentation scripts are kept in one scrollable code surface. */
+.doc-body{min-width:0;max-width:100%;margin-top:15px;line-height:1.7}
+.doc-prose{overflow-wrap:anywhere;margin:12px 0 20px;color:#e6e7ea}
+.script-panel{width:100%;max-width:100%;min-width:0;background:#0b0d11;border:1px solid #ffffff2b;border-radius:15px;margin:17px 0;overflow:hidden}
+.script-panel-head{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 14px;border-bottom:1px solid #ffffff26;color:#cdd2d9;font-size:12px;font-weight:700}
+.script-panel-head .btn{min-height:33px;padding:7px 12px;font-size:11px;flex-shrink:0}
+.script-panel-pre{display:block;max-width:100%;width:100%;padding:18px 19px;margin:0;background:transparent;overflow-x:auto;overflow-y:auto;white-space:pre;tab-size:4;line-height:1.55;font-size:12px}
+.script-panel-pre code{font-family:ui-monospace,SFMono-Regular,Consolas,"Liberation Mono",monospace;white-space:pre;color:#e6e9ef}
+#modal-fields textarea[name="body"]{min-height:260px;font-family:ui-monospace,SFMono-Regular,Consolas,monospace;font-size:13px;line-height:1.6;tab-size:4}
