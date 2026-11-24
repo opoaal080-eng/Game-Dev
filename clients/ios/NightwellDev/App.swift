@@ -455,6 +455,39 @@ struct CharacterEditor: View {
     }
 }
 
+struct DataSourcePanel: View {
+    @EnvironmentObject var store: DevStore
+    let itemName: String
+
+    var body: some View {
+        GlassCard {
+            VStack(alignment: .leading, spacing: 9) {
+                Label("Источник данных", systemImage: "server.rack")
+                    .font(.caption.bold()).foregroundStyle(Palette.muted)
+                Text(store.serverOrigin)
+                    .font(.caption.monospaced())
+                    .foregroundStyle(.white)
+                    .textSelection(.enabled)
+                    .fixedSize(horizontal: false, vertical: true)
+                Text("Если \(itemName) загружены с ПК, здесь должен быть тот же адрес, что и у сайта в браузере на ПК.")
+                    .font(.caption).foregroundStyle(Palette.muted)
+                HStack {
+                    Button {
+                        Task { await store.refresh() }
+                    } label: {
+                        Label("Обновить", systemImage: "arrow.clockwise")
+                    }
+                    Spacer()
+                    Button("Сменить сервер") {
+                        Task { await store.logout() }
+                    }
+                }
+                .font(.caption.bold())
+            }
+        }
+    }
+}
+
 struct DocumentationScreen: View {
     @EnvironmentObject var store: DevStore
     @State private var showEditor = false
@@ -467,6 +500,7 @@ struct DocumentationScreen: View {
         ScrollView {
             LazyVStack(alignment: .leading, spacing: 14) {
                 HeaderLabel(title: "Документация.", caption: "NIGHTWELL STUDIO / БАЗА ЗНАНИЙ")
+                DataSourcePanel(itemName: "документы")
                 Text("Опубликованные инструкции, технические решения и скрипты команды.")
                     .font(.subheadline).foregroundStyle(Palette.muted)
                 if let error = store.sectionErrors["Документация"] {
@@ -505,6 +539,7 @@ struct DocumentationScreen: View {
         .background(Palette.background)
         .navigationTitle("Документация")
         .refreshable { await store.refresh() }
+        .task { await store.refresh() }
         .toolbar {
             if store.user?.can_write == true {
                 ToolbarItem(placement: .topBarTrailing) {
@@ -774,6 +809,7 @@ struct FilesScreen: View {
         ScrollView {
             LazyVStack(alignment: .leading, spacing: 12) {
                 HeaderLabel(title: "Файлы.", caption: "NIGHTWELL STUDIO / МАТЕРИАЛЫ КОМАНДЫ")
+                DataSourcePanel(itemName: "файлы")
                 if let error = store.sectionErrors["Файлы"] {
                     Notice(text: "Не удалось получить файлы: " + error)
                     QuietButton(title: "Повторить", symbol: "arrow.clockwise") {
@@ -839,6 +875,7 @@ struct FilesScreen: View {
         .background(Palette.background)
         .navigationTitle("Файлы")
         .refreshable { await store.refresh() }
+        .task { await store.refresh() }
         .toolbar {
             if store.user?.can_write == true {
                 ToolbarItem(placement: .topBarTrailing) {
