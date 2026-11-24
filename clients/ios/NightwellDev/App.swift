@@ -747,34 +747,108 @@ struct FilesScreen: View {
     @EnvironmentObject var store: DevStore
     @State private var selectedFile: URL?
     @State private var message: String?
+    @State private var importerPresented = false
+    @State private var transferring = false
+
     var body: some View {
         ScrollView {
-            VStack(spacing: 12) {
+            LazyVStack(alignment: .leading, spacing: 12) {
+                HeaderLabel(title: "Файлы.", caption: "NIGHTWELL STUDIO / МАТЕРИАЛЫ КОМАНДЫ")
+                if let error = store.sectionErrors["Файлы"] {
+                    Notice(text: "Не удалось получить файлы: " + error)
+                    QuietButton(title: "Повторить", symbol: "arrow.clockwise") {
+                        Task { await store.refresh() }
+                    }
+                }
+                if transferring {
+                    HStack(spacing: 11) {
+                        ProgressView()
+                        Text("Передача файла…").font(.subheadline)
+                    }
+                    .padding(13)
+                }
+                if store.files.isEmpty && store.sectionErrors["Файлы"] == nil {
+                    GlassCard {
+                        Label("Файлы не найдены", systemImage: "folder.badge.questionmark")
+                            .font(.headline)
+                        Text("На этом сервере пока нет загруженных файлов. Проверь выбранный сервер или добавь первый файл.")
+                            .font(.subheadline).foregroundStyle(Palette.muted)
+                    }
+                }
                 ForEach(store.files) { asset in
                     GlassCard {
                         HStack(spacing: 13) {
-                            Image(systemName: "doc.fill").font(.title2)
+                            Image(systemName: "doc.zipper")
+                                .font(.title2).foregroundStyle(.white)
                             VStack(alignment: .leading, spacing: 5) {
                                 Text(asset.title).font(.headline)
                                 Text(asset.original_name).font(.caption).foregroundStyle(Palette.muted)
+                                Text(asset.uploader + " · " + ByteCountFormatter.string(
+                                    fromByteCount: Int64(asset.size), countStyle: .file))
+                                    .font(.caption2).foregroundStyle(Palette.muted)
                             }
-                            Spacer()
+                            Spacer(minLength: 8)
                             Button {
+                                transferring = true
                                 Task {
-                                    do { selectedFile = try await store.download(asset) }
-                                    catch { message = error.localizedDescription }
+                                    defer { transferring = false }
+                                    do {
+                                        selectedFile = try await store.download(asset)
+                                        message = nil
+                                    } catch { message = error.localizedDescription }
                                 }
-                            } label: { Image(systemName: "square.and.arrow.down").padding(9) }
+                            } label: {
+                                Image(systemName: "square.and.arrow.down")
+                                    .padding(9)
+                            }
+                            .disabled(transferring)
                         }
                     }
                 }
                 if let message { Notice(text: message) }
                 if let selectedFile {
-                    ShareLink(item: selectedFile) { Label("Поделиться скачанным файлом", systemImage: "square.and.arrow.up") }
+                    ShareLink(item: selectedFile) {
+                        Label("Поделиться или сохранить скачанный файл",
+                              systemImage: "square.and.arrow.up")
+                    }
+                    .font(.subheadline.bold()).padding(.top, 9)
                 }
-            }.padding(18)
-        }.navigationTitle("Файлы").background(Palette.background)
-            .refreshable { await store.refresh() }
+            }
+            .padding(18)
+        }
+        .background(Palette.background)
+        .navigationTitle("Файлы")
+        .refreshable { await store.refresh() }
+        .toolbar {
+            if store.user?.can_write == true {
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button { importerPresented = true } label: { Image(systemName: "plus") }
+                        .disabled(transferring)
+                }
+            }
+        }
+        .fileImporter(
+            isPresented: $importerPresented,
+            allowedContentTypes: [.item],
+            allowsMultipleSelection: false
+        ) { result in
+            switch result {
+            case .success(let urls):
+                guard let source = urls.first else { return }
+                transferring = true
+                Task {
+                    defer { transferring = false }
+                    do {
+                        try await store.uploadFile(at: source)
+                        message = nil
+                    } catch {
+                        message = error.localizedDescription
+                    }
+                }
+            case .failure(let error):
+                message = error.localizedDescription
+            }
+        }
     }
 }
 
@@ -793,6 +867,9 @@ struct TeamScreen: View {
                                 Text(person.name).font(.headline)
                                 Text(person.role == "admin" ? "Администратор" : person.role == "developer" ? "Разработчик" : "Наблюдатель")
                                     .font(.caption).foregroundStyle(Palette.muted)
+                                if let jobTitle = person.job_title, !jobTitle.isEmpty {
+                                    Text(jobTitle).font(.caption2).foregroundStyle(Palette.muted)
+                                }
                             }
                         }
                     }
