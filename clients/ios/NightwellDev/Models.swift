@@ -6,6 +6,7 @@ struct APIUser: Codable, Identifiable {
     let name: String
     let role: String
     let can_write: Bool
+    let job_title: String?
 }
 struct AuthReply: Decodable { let token: String; let user: APIUser }
 struct MeReply: Decodable { let user: APIUser }
@@ -36,6 +37,8 @@ struct DevPost: Codable, Identifiable {
     let author: String
     let author_id: Int
     let updated_at: String
+    let content_mode: String?
+    let code_language: String?
 }
 struct DevTask: Codable, Identifiable {
     let id: Int
